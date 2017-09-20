@@ -1,8 +1,10 @@
 function alfa=calc_alfa(X,d,type)
 	if (type == "golden")
 		alfa=golden_section(X,d);
-	else
+	elseif (type  == "bisection")
 		alfa=bisection(X,d);
+	else
+		error("wrong 'type' input");
 	end
 	fprintf('alfa = %2.7f\n', alfa);
 end

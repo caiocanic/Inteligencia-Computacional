@@ -1,11 +1,11 @@
-function [X,nroIteracoes]=gradiente(X)
+function [X,nroIteracoes]=gradiente(X,alphaMethod)
 	nroIteracoes=0;
 	%alfa = 0.5;
 	[~,g,~] = calc_func(X);
 	
 	while norm(g)>1.0e-6
 		d = -g;
-		alfa = calc_alfa(X,d);
+		alfa = calc_alfa(X,d,alphaMethod);
 		X = X + alfa*d;
 		[~,g,~] = calc_func(X);
 		nroIteracoes=nroIteracoes+1;

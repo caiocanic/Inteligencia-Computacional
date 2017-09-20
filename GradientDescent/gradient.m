@@ -1,4 +1,4 @@
-function [X,nroIteracoes]=gradiente(X,alphaMethod)
+function [X,nroIteracoes]=gradient(X,alphaMethod)
 	nroIteracoes=0;
 	%alfa = 0.5;
 	[~,g,~] = calc_func(X);

@@ -11,11 +11,11 @@ function [resultSyncLetter, resultAsyncLetter, resultSyncNumber, resultAsyncNumb
 	
 	%1)Teste sincrono
 	fprintf('Testando atualização sincrona\n');
-	resultSyncLetter = test_hopfield(letras, noisePercentages, numTests, "synchronous", "tanh", K, N, res, label);
+	resultSyncLetter = test_hopfield(letras, noisePercentages, numTests, "synchronous", "tanh", K, N, res, label)/numTests;
 	
 	%2)Teste assincrono
 	fprintf('Testando atualização assincrona\n');
-	resultAsyncLetter = test_hopfield(letras, noisePercentages, numTests, "asynchronous", "tanh", K, N, res, label);
+	resultAsyncLetter = test_hopfield(letras, noisePercentages, numTests, "asynchronous", "tanh", K, N, res, label)/numTests;
 	
 	%Testes do conjunto numeros.dat
 	[K,N]=size(numeros);
@@ -24,11 +24,11 @@ function [resultSyncLetter, resultAsyncLetter, resultSyncNumber, resultAsyncNumb
 	
 	%1)Teste sincrono
 	fprintf('Testando atualização sincrona\n');
-	resultSyncNumber = test_hopfield(numeros, noisePercentages, numTests, "synchronous", "tanh", K, N, res, label);
+	resultSyncNumber = test_hopfield(numeros, noisePercentages, numTests, "synchronous", "tanh", K, N, res, label)/numTests;
 	
 	%2)Teste assincrono
 	fprintf('Testando atualização assincrona\n');
-	resultAsyncNumber = test_hopfield(numeros, noisePercentages, numTests, "asynchronous", "tanh", K, N, res, label);
+	resultAsyncNumber = test_hopfield(numeros, noisePercentages, numTests, "asynchronous", "tanh", K, N, res, label)/numTests;
 end
 
 function result=test_hopfield(figures, noisePercentages, numTests, typeTest, typeActivation, K, N,res,label)

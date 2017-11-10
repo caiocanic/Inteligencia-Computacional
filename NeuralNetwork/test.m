@@ -1,26 +1,40 @@
 function [A,B,Y] = test()
-	%Xtr = [0 0; 0 1; 1 0; 1 1];
-	%Yd = [0;1;1;0];
-	%Xts = [0 0; 0 1; 1 0; 1 1];
-	lag = 5;
-	porcentagemValidacao = 0.3;
+	lag = 10;
+	porcValidacao = 0.3;
 	datasetTreinamento = load("Dataset_series/serie2_trein.txt");
-	[Xtr,Ydtr,Xvl,Ydvl] = processDatasetTreinamento(datasetTreinamento, lag,porcentagemValidacao);
-	Xts = load("Dataset_series/serie2_test.txt");
-	h=5;
+	datasetTeste = load("Dataset_series/serie2_test.txt");
+	[Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag,porcValidacao);
+	Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag);
+	h=4;
 	[A,B,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
 	
 	%{
-	plot(dataset,'DisplayName','dataset');
+	plot(datasetTeste,'DisplayName','dataset');
 	hold on;
 	plot(Y,'DisplayName','Y');
 	hold off;
 	%}
 end
 
-function [Xtr,Ydtr,Xvl,Ydvl] = processDatasetTreinamento(dataset, lag, porcentagemValidacao)
+function Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag)
+	%Gera os atrasos
+	Xts = zeros(size(datasetTeste,1),lag+1);
+	i=1;
+	while i <= lag+1
+		Xts(i:end,i) = datasetTeste(1:end-i+1,1);
+		i = i+1;
+	end
+	%Pega os valores atrasados do treinamento
+	i=1;
+	while i <=lag
+		Xts(1:i,i+1) = datasetTreinamento(end-i+1:end,1);
+		i = i+1;
+	end
+end
+
+function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao)
 	%normalização min-max
-	datasetNorm = dataset/max(abs(dataset));
+	datasetNorm = datasetTreinamento/max(abs(datasetTreinamento));
 	%Adiciona os lags e a saída desejada
 	i=1;
 	temp=datasetNorm(1:end-1);
@@ -30,7 +44,7 @@ function [Xtr,Ydtr,Xvl,Ydvl] = processDatasetTreinamento(dataset, lag, porcentag
 		temp = [0;temp(1:end-1)];
 		i = i+1;
 	end
-	X(:,end) = dataset(2:end);
+	X(:,end) = datasetTreinamento(2:end);
 	%randomiza a ordem das entradas
 	[m,~] = size(X);
 	idx = randperm(m);
@@ -39,9 +53,8 @@ function [Xtr,Ydtr,Xvl,Ydvl] = processDatasetTreinamento(dataset, lag, porcentag
 		X(idx(i),:)=temp(i,:);
 	end
 	%Gera os conjuntos de treinamento e validação
-	Xvl=X(1:floor(length(X)*(porcentagemValidacao)),1:end-1);
-	Ydvl=X(1:floor(length(X)*(porcentagemValidacao)),end);
-	
-	Xtr=X(ceil(length(X)*(porcentagemValidacao)):end,1:end-1);
-	Ydtr=X(ceil(length(X)*(porcentagemValidacao)):end,end);
+	Xvl=X(1:floor(length(X)*(porcValidacao)),1:end-1);
+	Ydvl=X(1:floor(length(X)*(porcValidacao)),end);
+	Xtr=X(ceil(length(X)*(porcValidacao)):end,1:end-1);
+	Ydtr=X(ceil(length(X)*(porcValidacao)):end,end);
 end

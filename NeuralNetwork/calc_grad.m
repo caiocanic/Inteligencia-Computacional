@@ -4,7 +4,6 @@ function [dJdA, dJdB] = calc_grad(X,Yd,A,B,N)
 	Yin = [Z,ones(N,1)]*B';
 	Y = tanh(Yin);
 	erro = Y-Yd;
-	
 	dJdB = 1/N*(erro.*(1-Y.*Y))'*[Z,ones(N,1)];
 	dJdZ = (erro.*(1-Y.*Y))*B;
 	dJdZ = dJdZ(:,1:end-1);

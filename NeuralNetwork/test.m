@@ -1,12 +1,10 @@
-function [A,B,Y] = test()
-	lag = 10;
+function test()
+	hMax=12;
+	lagMax = 15;
+	nroTestes = 10;
 	porcValidacao = 0.3;
-	datasetTreinamento = load("Dataset_series/serie2_trein.txt");
-	datasetTeste = load("Dataset_series/serie2_test.txt");
-	[Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag,porcValidacao);
-	Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag);
-	h=4;
-	[A,B,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
+
+	testaMlp(hMax, lagMax, nroTestes, porcValidacao);
 	
 	%{
 	plot(datasetTeste,'DisplayName','dataset');
@@ -16,45 +14,27 @@ function [A,B,Y] = test()
 	%}
 end
 
-function Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag)
-	%Gera os atrasos
-	Xts = zeros(size(datasetTeste,1),lag+1);
-	i=1;
-	while i <= lag+1
-		Xts(i:end,i) = datasetTeste(1:end-i+1,1);
-		i = i+1;
+function testaMlp(hMax, lagMax, nroTestes, porcValidacao)
+	for serie=1:4
+		EQMmedio = zeros(hMax-1,lagMax+1);
+		EQMdesvio = zeros(hMax-1,lagMax+1);
+		EQMtemp = zeros(1,10);
+		datasetTreinamento = load("Dataset_series/serie" + serie + "_trein.txt");
+		datasetTeste = load("Dataset_series/serie"+ serie + "_test.txt");
+		for h=2:hMax
+			for lag=0:lagMax
+				fprintf("serie: %d h: %d lag: %d\n", serie, h,lag);
+				for i=1:nroTestes
+					[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao);
+					[~,~,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
+					erro = Y(1:end-1,1) - datasetTeste(2:end,1);
+					EQMtemp(i) = 1/size(Xts,1)*sum(sum(erro.*erro));
+				end
+				EQMmedio(h-1,lag+1) = mean(EQMtemp);
+				EQMdesvio(h-1,lag+1) = std(EQMtemp);
+			end
+		end
+		save("EQMmedioSerie" + serie,"EQMmedio");
+		save("EQMdesvioSerie" + serie,"EQMdesvio");
 	end
-	%Pega os valores atrasados do treinamento
-	i=1;
-	while i <=lag
-		Xts(1:i,i+1) = datasetTreinamento(end-i+1:end,1);
-		i = i+1;
-	end
-end
-
-function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao)
-	%normalização min-max
-	datasetNorm = datasetTreinamento/max(abs(datasetTreinamento));
-	%Adiciona os lags e a saída desejada
-	i=1;
-	temp=datasetNorm(1:end-1);
-	X = zeros(length(temp),lag+2);
-	while i <= lag+1
-		X(:,i) = temp;
-		temp = [0;temp(1:end-1)];
-		i = i+1;
-	end
-	X(:,end) = datasetTreinamento(2:end);
-	%randomiza a ordem das entradas
-	[m,~] = size(X);
-	idx = randperm(m);
-	temp=X;
-	for i=1:m
-		X(idx(i),:)=temp(i,:);
-	end
-	%Gera os conjuntos de treinamento e validação
-	Xvl=X(1:floor(length(X)*(porcValidacao)),1:end-1);
-	Ydvl=X(1:floor(length(X)*(porcValidacao)),end);
-	Xtr=X(ceil(length(X)*(porcValidacao)):end,1:end-1);
-	Ydtr=X(ceil(length(X)*(porcValidacao)):end,end);
 end

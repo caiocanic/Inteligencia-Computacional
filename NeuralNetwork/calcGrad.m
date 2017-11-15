@@ -1,4 +1,4 @@
-function [dJdA, dJdB] = calc_grad(X,Yd,A,B,N)
+function [dJdA, dJdB] = calcGrad(X,Yd,A,B,N)
 	Zin = X*A';
 	Z = tanh(Zin);
 	Yin = [Z,ones(N,1)]*B';

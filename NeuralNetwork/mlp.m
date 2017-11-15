@@ -17,22 +17,22 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 	A = rands(h,netr+1)/5;
 	B = rands(ns,h+1)/5;
 	%Inicia Treinamento
-	Y = calc_saida(A,B,Xtr,Ntr);
+	Y = calcSaida(A,B,Xtr,Ntr);
 	errotr = Y-Ydtr;
 	EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
 	%Inicia Validação
-	Yvl = calc_saida(A,B,Xvl,Nvl);
+	Yvl = calcSaida(A,B,Xvl,Nvl);
 	errovl = Yvl-Ydvl;
 	EQMvl(nep) = 1/Nvl*sum(sum(errovl.*errovl));
 	EQMvlBest = EQMvl(nep);
 	while EQMtr(nep) > 1.0e-5 && nep < nepMax
 		nep = nep+1;
-		[dJdA, dJdB] = calc_grad(Xtr,Ydtr,A,B,Ntr);
+		[dJdA, dJdB] = calcGrad(Xtr,Ydtr,A,B,Ntr);
 		%alfa = calc_alfa(A,B,dJdA,dJdB,Xtr,Ydtr,Ntr);
 		Anew = A - alfa*dJdA;
 		Bnew = B - alfa*dJdB;
 		%Validação
-		Yvl = calc_saida(Anew,Bnew,Xvl,Nvl);
+		Yvl = calcSaida(Anew,Bnew,Xvl,Nvl);
 		errovl = Yvl-Ydvl;
 		EQMvl(nep) = 1/Ntr*sum(sum(errovl.*errovl));
 		if EQMvl(nep) < EQMvlBest
@@ -43,29 +43,31 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 		%Fim da validação
 		A = Anew;
 		B = Bnew;
-		Y = calc_saida(A,B,Xtr,Ntr);
+		Y = calcSaida(A,B,Xtr,Ntr);
 		errotr = Y-Ydtr;
 		EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
-		fprintf("EQMtr: %f\n",EQMtr(nep));
+		%fprintf("EQMtr: %f\n",EQMtr(nep));
 	end
 	A = ABest;
 	B = BBest;
 	
+	%{
 	plot(EQMtr);
 	hold on;
 	plot(EQMvl);
 	hold off;
 	pause;
+	%}
 end
 
 function Y = teste(A,B,Xts)
 	[N,~] = size(Xts);
 	%Adiciona o bias
 	Xts = [Xts, ones(N,1)];
-	Y = calc_saida(A,B,Xts,N);
+	Y = calcSaida(A,B,Xts,N);
 end
 
-function Y = calc_saida(A,B,X,N)
+function Y = calcSaida(A,B,X,N)
 	Zin = X*A';
 	Z = tanh(Zin);
 	Yin = [Z,ones(N,1)]*B';

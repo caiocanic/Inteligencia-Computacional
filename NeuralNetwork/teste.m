@@ -1,4 +1,4 @@
-function test()
+function teste()
 	hMax=12;
 	lagMax = 15;
 	nroTestes = 10;

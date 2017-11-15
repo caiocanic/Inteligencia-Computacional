@@ -1,11 +1,11 @@
 function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao)
 	maxTr = max(abs(datasetTreinamento));
 	[Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao,maxTr);
-	Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag);
+	Xts = processaDatasetTeste(datasetTreinamento, datasetTeste, lag);
 end
 
 function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao, maxTr)
-	%normalização max-min
+	%Normalização max-min
 	datasetNorm = datasetTreinamento/maxTr;
 	%Adiciona os lags e a saída desejada
 	i=1;
@@ -17,7 +17,7 @@ function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, la
 		i = i+1;
 	end
 	X(:,end) = datasetTreinamento(2:end);
-	%randomiza a ordem das entradas
+	%Randomiza a ordem das entradas
 	[m,~] = size(X);
 	idx = randperm(m);
 	temp=X;
@@ -31,8 +31,8 @@ function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, la
 	Ydtr=X(ceil(length(X)*(porcValidacao)):end,end);
 end
 
-function Xts = processaDatasetTest(datasetTreinamento, datasetTeste, lag, maxTr)
-	%normalização max-min
+function Xts = processaDatasetTeste(datasetTreinamento, datasetTeste, lag, maxTr)
+	%Normalização max-min
 	datasetNorm = datasetTeste/maxTr;
 	datasetTreinamento = datasetTreinamento/maxTr;
 	%Gera os atrasos

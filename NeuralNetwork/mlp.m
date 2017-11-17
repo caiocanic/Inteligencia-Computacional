@@ -17,6 +17,7 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 	A = rands(h,netr+1)/5;
 	B = rands(ns,h+1)/5;
 	%Inicia Treinamento
+	[dJdA, dJdB] = calcGrad(Xtr,Ydtr,A,B,Ntr);
 	Y = calcSaida(A,B,Xtr,Ntr);
 	errotr = Y-Ydtr;
 	EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
@@ -27,8 +28,7 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 	EQMvlBest = EQMvl(nep);
 	while EQMtr(nep) > 1.0e-5 && nep < nepMax
 		nep = nep+1;
-		[dJdA, dJdB] = calcGrad(Xtr,Ydtr,A,B,Ntr);
-		%alfa = calc_alfa(A,B,dJdA,dJdB,Xtr,Ydtr,Ntr);
+		%Atualiza os pesos
 		Anew = A - alfa*dJdA;
 		Bnew = B - alfa*dJdB;
 		%Validação
@@ -40,9 +40,15 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 			BBest = B;
 			EQMvlBest = EQMvl(nep-1);
 		end
-		%Fim da validação
 		A = Anew;
 		B = Bnew;
+		%Recálcula o gradiente
+		dJdAOld = dJdA;
+		dJdBOld = dJdB;
+		[dJdA, dJdB] = calcGrad(Xtr,Ydtr,A,B,Ntr);
+		%Cálcula o novo alfa
+		alfa = calcAlfa(dJdAOld,dJdBOld,dJdA,dJdB,alfa);
+		%Cálcula o erro
 		Y = calcSaida(A,B,Xtr,Ntr);
 		errotr = Y-Ydtr;
 		EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
@@ -72,4 +78,15 @@ function Y = calcSaida(A,B,X,N)
 	Z = tanh(Zin);
 	Yin = [Z,ones(N,1)]*B';
 	Y = tanh(Yin);
+end
+
+function alfa = calcAlfa(dJdAOld,dJdBOld,dJdA,dJdB,alfaOld)
+	EOld = [dJdAOld(:)' dJdBOld(:)'];
+	ENew = [dJdA(:)' dJdB(:)'];
+	cosTeta = ENew*EOld'/(norm(ENew)*norm(EOld));
+	alfa = alfaOld*(1 +(0.5*cosTeta));
+	if alfa >= 1
+		alfa = 0.9999;
+	end
+	%fprintf("alfa: %2.5f\n",alfa);
 end

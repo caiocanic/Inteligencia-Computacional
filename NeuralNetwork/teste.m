@@ -4,7 +4,14 @@ function teste()
 	nroTestes = 10;
 	porcValidacao = 0.3;
 
-	testaMlp(hMax, lagMax, nroTestes, porcValidacao);
+	h=3;
+	lag=5;
+	datasetTreinamento = load("Dataset_series/serie1_trein.txt");
+	datasetTeste = load("Dataset_series/serie1_test.txt");
+	[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao);
+	[A,B,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
+	
+	%testaMlp(hMax, lagMax, nroTestes, porcValidacao);
 	
 	%{
 	plot(datasetTeste,'DisplayName','dataset');

@@ -1,7 +1,7 @@
 function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao)
 	maxTr = max(abs(datasetTreinamento));
 	[Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao,maxTr);
-	Xts = processaDatasetTeste(datasetTreinamento, datasetTeste, lag);
+	Xts = processaDatasetTeste(datasetTreinamento, datasetTeste, lag, maxTr);
 end
 
 function [Xtr,Ydtr,Xvl,Ydvl] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao, maxTr)

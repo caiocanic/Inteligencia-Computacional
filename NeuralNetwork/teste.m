@@ -3,15 +3,16 @@ function teste()
 	lagMax = 15;
 	nroTestes = 10;
 	porcValidacao = 0.3;
-
+	testaMlp(hMax, lagMax, nroTestes, porcValidacao);
+	
+	%{
 	h=3;
 	lag=5;
-	datasetTreinamento = load("Dataset_series/serie1_trein.txt");
-	datasetTeste = load("Dataset_series/serie1_test.txt");
+	datasetTreinamento = load("Dataset_series/serie2_trein.txt");
+	datasetTeste = load("Dataset_series/serie2_test.txt");
 	[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao);
 	[A,B,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
-	
-	%testaMlp(hMax, lagMax, nroTestes, porcValidacao);
+	%}
 	
 	%{
 	plot(datasetTeste,'DisplayName','dataset');
@@ -32,9 +33,13 @@ function testaMlp(hMax, lagMax, nroTestes, porcValidacao)
 			for lag=0:lagMax
 				fprintf("serie: %d h: %d lag: %d\n", serie, h,lag);
 				for i=1:nroTestes
-					[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao);
+					[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao,serie);
 					[~,~,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h);
-					erro = Y(1:end-1,1) - datasetTeste(2:end,1);
+					if serie == 2
+						erro = Y(1:end-1,1) - datasetTeste(3:end,1);
+					else
+						erro = Y(1:end-1,1) - datasetTeste(2:end,1);
+					end
 					EQMtemp(i) = 1/size(Xts,1)*sum(sum(erro.*erro));
 				end
 				EQMmedio(h-1,lag+1) = mean(EQMtemp);

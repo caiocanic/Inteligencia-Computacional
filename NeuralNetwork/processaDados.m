@@ -1,24 +1,14 @@
-function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao, serie)
-	[Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao, serie);
-	Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr, serie);
+function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao)
+	[Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao);
+	Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr);
 end
 
-function [Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao, serie)
-	%Remove tendência da série 2
-	if serie == 2
-		datasetNormTr = zeroes(1,length(datasetTreinamento)-1);
-		for i=1:length(datasetTreinamento)-1
-			datasetNormTr(i) = datasetTreinamento(i+1) - datasetTreinamento(i);
-		end
-		%Normalização max-min
-		maxTr = max(abs(datasetNormTr));
-		datasetNormTr = datasetNormTr/maxTr;
-		datasetTreinamento = datasetTreinamento(2:end);
-	else
-		%Normalização max-min
-		maxTr = max(abs(datasetTreinamento));
-		datasetNormTr = datasetTreinamento/maxTr;
-	end
+function [Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao)
+	%Remove tendência da serie
+	datasetNormTr = detrend(datasetTreinamento);
+	%Normalização max-min
+	maxTr = max(abs(datasetNormTr));
+	datasetNormTr = datasetNormTr/maxTr;
 	%Adiciona os lags e a saída desejada
 	i=1;
 	temp=datasetNormTr(1:end-1);
@@ -43,19 +33,11 @@ function [Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(da
 	Ydtr=X(ceil(length(X)*(porcValidacao)):end,end);
 end
 
-function Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr, serie)
-	%Remove tendência da série 2
-	if serie == 2
-		datasetNormTs = zeroes(1,length(datasetTeste)-1);
-		for i=1:length(datasetTeste)-1
-			datasetNormTs(i) = datasetTeste(i+1) - datasetTeste(i);
-		end
-		%Normalização max-min
-		datasetNormTs = datasetTeste/maxTr;
-	else
-		%Normalização max-min
-		datasetNormTs = datasetTeste/maxTr;
-	end
+function Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr)
+	%Remove tendência da série
+	datasetNormTs = detrend(datasetTeste);
+	%Normalização max-min
+	datasetNormTs = datasetNormTs/maxTr;
 	%Gera os atrasos
 	Xts = zeros(size(datasetNormTs,1),lag+1);
 	i=1;

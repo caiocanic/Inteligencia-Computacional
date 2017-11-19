@@ -41,7 +41,7 @@ function testaMlp(hMax, lagMax, nroTestes, porcValidacao)
 				EQMdesvio(h-1,lag+1) = std(EQMtemp);
 			end
 		end
-		save("EQMmedioSerie" + serie,"EQMmedio");
-		save("EQMdesvioSerie" + serie,"EQMdesvio");
+		save("EQMmedioAlfaVariavelSerie" + serie + ".mat","EQMmedio");
+		save("EQMdesvioAlfaVariavelSerie" + serie + ".mat","EQMdesvio");
 	end
 end

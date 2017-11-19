@@ -4,7 +4,7 @@ function [A,B,Y] = mlp(Xtr,Ydtr,Xvl,Ydvl,Xts,h)
 end
 
 function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
-	alfa = 0.1;
+	alfa = 1;
 	nepMax = 20000;
 	nep = 1;
 	[Ntr,netr] = size(Xtr);
@@ -28,6 +28,8 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 	EQMvlBest = EQMvl(nep);
 	while EQMtr(nep) > 1.0e-5 && nep < nepMax
 		nep = nep+1;
+		%Cálcula o alfa pela bissecao
+		alfa = Alfa.bissecao(A,B,dJdA,dJdB,Xtr,Ydtr,Ntr);
 		%Atualiza os pesos
 		Anew = A - alfa*dJdA;
 		Bnew = B - alfa*dJdB;
@@ -46,8 +48,8 @@ function [A,B] = treinamento(Xtr,Ydtr,Xvl,Ydvl,h)
 		dJdAOld = dJdA;
 		dJdBOld = dJdB;
 		[dJdA, dJdB] = calcGrad(Xtr,Ydtr,A,B,Ntr);
-		%Cálcula o novo alfa
-		alfa = calcAlfa(dJdAOld,dJdBOld,dJdA,dJdB,alfa);
+		%Cálcula o alfa pelo ângulo entre os gradientes
+		%alfa = Alfa.angulo(dJdAOld,dJdBOld,dJdA,dJdB,alfa);
 		%Cálcula o erro
 		Y = calcSaida(A,B,Xtr,Ntr);
 		errotr = Y-Ydtr;
@@ -78,15 +80,4 @@ function Y = calcSaida(A,B,X,N)
 	Z = tanh(Zin);
 	Yin = [Z,ones(N,1)]*B';
 	Y = tanh(Yin);
-end
-
-function alfa = calcAlfa(dJdAOld,dJdBOld,dJdA,dJdB,alfaOld)
-	EOld = [dJdAOld(:)' dJdBOld(:)'];
-	ENew = [dJdA(:)' dJdB(:)'];
-	cosTeta = ENew*EOld'/(norm(ENew)*norm(EOld));
-	alfa = alfaOld*(1 +(0.5*cosTeta));
-	if alfa >= 1
-		alfa = 0.9999;
-	end
-	%fprintf("alfa: %2.5f\n",alfa);
 end

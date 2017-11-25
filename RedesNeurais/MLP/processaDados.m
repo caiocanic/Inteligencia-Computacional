@@ -1,14 +1,44 @@
+%{
+Função responsável pela chamada das funções de pré-processamento dos conjuntos de dados
+de treinamento e teste.
+Parâmetros
+datasetTreinamento: Conjunto de dados para treinamento;
+datasetTeste: Conjunto de dados para teste;
+lag: Quantidade de atrasos que serão inseridos na MLP;
+porcValidacao: Porcentagem do conjunto de dados de treinamento que será
+dedicada a validação;
+Saídas
+Xtr: Conjunto de dados de entrada para a etapa de treinamento;
+Ydtr: Saída desejada para o conjunto Xtr;
+Xvl: Conjunto de dados para a etapa de validação;
+Ydvl: Saída desejada para o conjunto Xvl;
+Xts: Conjunto de dados de entrada para a etapa de teste;
+%}
 function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao)
-	[Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao);
-	Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr);
+	[Xtr,Ydtr,Xvl,Ydvl,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao);
+	Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag);
 end
 
-function [Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao)
-	%Remove tendência da serie
+%{
+Função encarregada pelo pré-processamento do conjunto de dados de
+treinamento. Ela é responsável por remover a tendência das séries (quando
+houver), normalizar os dados e gerar as entradas atrasadas. Além disso a
+função separa parte do conjunto de treinamento para a validação.
+Parâmetros
+datasetTreinamento: Conjunto de dados para treinamento;
+lag: Quantidade de atrasos que serão inseridos na MLP;
+porcValidacao: Porcentagem do conjunto de dados de treinamento que será
+dedicada a validação;
+Saídas
+Xtr: Conjunto de dados de entrada para a etapa de treinamento;
+Ydtr: Saída desejada para o conjunto Xtr;
+Xvl: Conjunto de dados para a etapa de validação;
+Ydvl: Saída desejada para o conjunto Xvl;
+datasetNormTr: Conjunto de dados da etapa de treinamento normalizados;
+%}
+function [Xtr,Ydtr,Xvl,Ydvl,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao)
+	%Remove tendência da serie (se houver) e normaliza
 	datasetNormTr = detrend(datasetTreinamento);
-	%Normalização max-min
-	maxTr = max(abs(datasetNormTr));
-	datasetNormTr = datasetNormTr/maxTr;
 	%Adiciona os lags e a saída desejada
 	i=1;
 	temp=datasetNormTr(1:end-1);
@@ -33,11 +63,21 @@ function [Xtr,Ydtr,Xvl,Ydvl,maxTr,datasetNormTr] = processaDatasetTreinamento(da
 	Ydtr=X(ceil(length(X)*(porcValidacao)):end,end);
 end
 
-function Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag, maxTr)
-	%Remove tendência da série
+%{
+Função encarregada pelo pré-processamento do conjunto de dados de
+teste. Ela é responsável por remover a tendência das séries (quando
+houver), normalizar os dados e gerar as entradas atrasadas vindas do
+treinamento.
+Parâmetros
+datasetNormTr: Conjunto de dados da etapa de treinamento normalizados;
+datasetTeste: Conjunto de dados para teste;
+lag: Quantidade de atrasos que serão inseridos na MLP;
+Saídas
+Xts: Conjunto de dados de entrada para a etapa de teste;
+%}
+function Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag)
+	%Remove tendência da série (se houver) e normaliza
 	datasetNormTs = detrend(datasetTeste);
-	%Normalização max-min
-	datasetNormTs = datasetNormTs/maxTr;
 	%Gera os atrasos
 	Xts = zeros(size(datasetNormTs,1),lag+1);
 	i=1;

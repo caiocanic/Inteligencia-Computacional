@@ -121,7 +121,7 @@ classdef Alfa < handle
 			if alfa.valor >= 1
 				alfa.valor = mlp.alfa.valor*0.9;
 			end
-			fprintf("alfa: %2.5f\n",alfa.valor);
+			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
 	end
 	methods (Static = true, Access = private)
@@ -139,6 +139,8 @@ classdef Alfa < handle
 			ANew = mlp.A - alfaTest*mlp.dJdA;
 			BNew = mlp.B - alfaTest*mlp.dJdB;
 			[dJdALinha,dJdBLinha] = calcGrad(X,Yd,ANew,BNew,N);
+			%d = [mlp.dJdA(:); mlp.dJdB(:)];
+			%g = [dJdALinha(:); dJdBLinha(:)];
 			d = -[reshape(mlp.dJdA',1,numel(mlp.dJdA))'; reshape(mlp.dJdB',1,numel(mlp.dJdB))'];
 			g = [reshape(dJdALinha',1,numel(dJdALinha))'; reshape(dJdBLinha',1,numel(dJdBLinha))'];
 			hLinha = g'*d;

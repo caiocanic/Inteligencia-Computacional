@@ -1,5 +1,5 @@
 %{
-Classe responsável por representar uma Multilayer Perceptron.
+Classe responsável pelo objeto que representa uma Multilayer Perceptron.
 Atributos
 h: Número de neurónios da rede;
 nepMax: Número máximo de épocas para a condição de parada;
@@ -12,7 +12,7 @@ Y: Saída fornecida pela rede;
 %}
 classdef Mlp < handle
 	properties (SetAccess = private)
-		h; 
+		h;
 		nepMax;
 		alfa;
 		A;
@@ -73,6 +73,8 @@ classdef Mlp < handle
 			EQMvlBest = EQMvl(nep);
 			while EQMtr(nep) > 1.0e-5 && nep < mlp.nepMax
 				nep = nep+1;
+				%Cálcula o alfa pela razão áurea
+				%mlp.alfa.golden(mlp,Xtr,Ydtr,Ntr);
 				%Cálcula o alfa pela bissecao
 				mlp.alfa.bissecao(mlp,Xtr,Ydtr,Ntr);
 				%Atualiza os pesos
@@ -99,14 +101,12 @@ classdef Mlp < handle
 				mlp.Y = mlp.calcSaida(mlp.A,mlp.B,Xtr,Ntr);
 				errotr = mlp.Y-Ydtr;
 				EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
-				fprintf("EQMtr: %f\n",EQMtr(nep));
+				%fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
 			mlp.A = ABest;
 			mlp.B = BBest;
-
-			%{
-			mlp.plotEQM(EQMtr,EQMvl);
-			%}
+			
+			%mlp.plotEQM(EQMtr,EQMvl);
 		end
 		
 		%{

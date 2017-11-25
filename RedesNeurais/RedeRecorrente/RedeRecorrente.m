@@ -46,14 +46,16 @@ classdef RedeRecorrente < handle
 		end
 		
 		%{
-		Função responsável pela etapa de treinamento da RNN
+		Função responsável pela etapa de treinamento e validação da RNN
 		Parâmetros
 		rede: Objeto do tipo RedeRecorrente, equivale a rede para qual será
 		feito o treinamento;
 		Xtr: Conjunto de dados de entrada;
 		Ydtr: Saída desejada para o conjunto Xtr;
+		Xvl: Conjunto de dados de validação;
+		Ydvl: Saída desejada para Xvl;
 		%}
-		function treinamento(rede,Xtr,Ydtr)
+		function treinamento(rede,Xtr,Ydtr,Xvl,Ydvl)
 			nep=1;
 			[Ntr,netr] = size(Xtr);
 			ns = size(Ydtr,2);
@@ -67,6 +69,9 @@ classdef RedeRecorrente < handle
 			rede.Yold = zeros(ns*rede.L,1);
 			%Inicia Treinamento
 			[dJdA, dJdB, dJdC, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
+			%Inicia a validação
+			[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
+			EQMvlBest = EQMvl(nep);
 			while EQMtr(nep) > 1.0e-5 && nep < rede.nepMax
 				nep = nep+1;
 				%Atualiza os pesos
@@ -77,15 +82,48 @@ classdef RedeRecorrente < handle
 				rede.Yold(:) = 0;
 				%Recálcula o gradiente e o EQM
 				[dJdA, dJdB, dJdC, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
+				%Validação
+				[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
+				if EQMvl(nep) < EQMvlBest
+					ABest = rede.A;
+					BBest = rede.B;
+					CBest = rede.C;
+					EQMvlBest = EQMvl(nep);
+				end
 				fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
+			%Grava o melhor valor da validação
+			rede.A = ABest;
+			rede.B = BBest;
+			rede.C = CBest;
 		end
 		
+		%{
+		Função responsável pela etapa de teste da RNN
+		Parâmetros
+		rede: Objeto do tipo RedeRecorrente equivalente a rede que será
+		testada
+		Xts: Conjunto de dados de teste;
+		Yts: Saída desejada para o teste;
+		Saída
+		EQMts: Erro quadratico médio do teste;
+		%}
 		function EQMts = teste(rede,Xts,Ydts)
 			[rede.Yts, EQMts] = calcSaida(rede,Xts,Ydts);
 		end
 	end
 	methods (Access = private)
+		%{
+		Função auxiliar que cálcula a saída da RNN
+		Parâmetros
+		rede: Objeto do tipo RedeRecorrente equivalente a rede para qual a
+		saída será calculada
+		X: Entrada para qual a saída será calculada
+		Yd: Saída desejada de X;
+		Saídas
+		Y: Saída fornecida pela rede para X;
+		EQM: Erro quadrático médio de Y em relação a Yd;
+		%}	
 		function [Y,EQM] = calcSaida(rede,X,Yd)
 			[N,ns] = size(X);
 			Y = zeros(N,1);

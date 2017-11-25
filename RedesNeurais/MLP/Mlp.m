@@ -87,7 +87,7 @@ classdef Mlp < handle
 				if EQMvl(nep) < EQMvlBest
 					ABest = mlp.A;
 					BBest = mlp.B;
-					EQMvlBest = EQMvl(nep-1);
+					EQMvlBest = EQMvl(nep);
 				end
 				mlp.A = Anew;
 				mlp.B = Bnew;

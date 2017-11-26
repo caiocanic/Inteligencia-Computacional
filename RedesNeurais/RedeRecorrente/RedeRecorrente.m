@@ -7,8 +7,11 @@ L: Número de atrasos da rede;
 nepMax: Número de épocas máxima para a etapa de treinamento;
 alfa: Taxa de aprendizagem;
 A: Matriz de pesos das entradas atrasadas;
+dJdA: Gradiente da matriz A;
 B: Matriz de pesos das entradas externas;
+dJdB: Gradiente da matriz B;
 C: Matriz de pesos da camada de saída;
+dJdC: Gradiente da matriz C;
 Y: Saída da rede;
 Yold: Saída atrasada da rede, serve como entrada interna;
 %}
@@ -19,11 +22,12 @@ classdef RedeRecorrente < handle
 		nepMax;
 		alfa;
 		A;
+		dJdA
 		B;
+		dJdB
 		C;
+		dJdC
 		Yts;
-	end
-	properties
 		Yold;
 	end
 	methods
@@ -42,9 +46,8 @@ classdef RedeRecorrente < handle
 			rede.h = h;
 			rede.L = L;
 			rede.nepMax = nepMax;
-			rede.alfa = alfaInicial;
+			rede.alfa = Alfa(alfaInicial);
 		end
-		
 		%{
 		Função responsável pela etapa de treinamento e validação da RNN
 		Parâmetros
@@ -65,23 +68,27 @@ classdef RedeRecorrente < handle
 			rede.A = rands(rede.h,(ns*rede.L))/5;
 			rede.B = rands(rede.h,netr+1)/5;
 			rede.C = rands(ns,rede.h+1)/5;
-			%Inicializa a matriz de entradas atrasadas
-			rede.Yold = zeros(ns*rede.L,1);
 			%Inicia Treinamento
-			[dJdA, dJdB, dJdC, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
+			[rede.dJdA, rede.dJdB, rede.dJdC, rede.Yold, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
 			%Inicia a validação
 			[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
 			EQMvlBest = EQMvl(nep);
 			while EQMtr(nep) > 1.0e-5 && nep < rede.nepMax
 				nep = nep+1;
+				%Calcula o alfa
+				%bissecao(rede.alfa,rede,Xtr,Ydtr,Ntr,netr,ns);
 				%Atualiza os pesos
-				rede.A = rede.A - rede.alfa*dJdA;
-				rede.B = rede.B - rede.alfa*dJdB;
-				rede.C = rede.C - rede.alfa*dJdC;
-				%Resseta o Yold.
-				rede.Yold(:) = 0;
+				rede.A = rede.A - rede.alfa.valor*rede.dJdA;
+				rede.B = rede.B - rede.alfa.valor*rede.dJdB;
+				rede.C = rede.C - rede.alfa.valor*rede.dJdC;
+				%Salva os gradientes passados
+				dJdAOld = rede.dJdA;
+				dJdBOld = rede.dJdB;
+				dJdCOld = rede.dJdC;
 				%Recálcula o gradiente e o EQM
-				[dJdA, dJdB, dJdC, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
+				[rede.dJdA, rede.dJdB, rede.dJdC, rede.Yold, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
+				%Recálcula o alfa pelo ângulo
+				angulo(rede.alfa,rede,dJdAOld,dJdBOld,dJdCOld);
 				%Validação
 				[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
 				if EQMvl(nep) < EQMvlBest
@@ -90,12 +97,14 @@ classdef RedeRecorrente < handle
 					CBest = rede.C;
 					EQMvlBest = EQMvl(nep);
 				end
-				fprintf("EQMtr: %f\n",EQMtr(nep));
+				%fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
 			%Grava o melhor valor da validação
 			rede.A = ABest;
 			rede.B = BBest;
 			rede.C = CBest;
+			
+			%RedeRecorrente.plotEQM(EQMtr, EQMvl);
 		end
 		
 		%{
@@ -110,6 +119,22 @@ classdef RedeRecorrente < handle
 		%}
 		function EQMts = teste(rede,Xts,Ydts)
 			[rede.Yts, EQMts] = calcSaida(rede,Xts,Ydts);
+		end
+		
+		%{
+		Função auxiliar utilizada no cálculo do alfa. Atribui os valores
+		dos parâmetros as matrizes de pesos.
+		Parâmetros
+		rede: Objeto do tipo RedeRecorrente para o qual as matrizes de
+		pesos serão modificadas;
+		A: Valor que será atribuído a matriz de pesos A;
+		B: Valor que será atribuído a matriz de pesos B;
+		C: Valor que será atribuído a matriz de pesos C;
+		%}
+		function setPesos(rede,A,B,C)
+			rede.A = A;
+			rede.B = B;
+			rede.C = C;
 		end
 	end
 	methods (Access = private)
@@ -139,6 +164,22 @@ classdef RedeRecorrente < handle
 				rede.Yold(1:rede.L:(ns-1)*rede.L+1) = Y(t);
 			end
 			EQM = 1/N*sum(sum(vetErro.*vetErro))/N;
+		end
+	end
+	methods (Static = true)
+		%{
+		Função auxiliar utilizada para analisar o comportamento dos EQM's
+		do treinamento e da validação por meio do plot desses valores.
+		Parâmentros
+		EQMtr: Erro quadrático médio do treinamento;
+		EQMvl: Erro quadrático médio da validação;
+		%}
+		function plotEQM(EQMtr, EQMvl)
+			plot(EQMtr);
+			hold on;
+			plot(EQMvl);
+			hold off;
+			pause;
 		end
 	end
 end

@@ -5,9 +5,9 @@ function teste()
 	lagMax = 7;
 	nroTestes = 10;
 	porcValidacao = 0.3;
-	testaRede(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao);
+	%testaRede(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao);
 	
-	%{
+	%
 	h=2;
 	lag=3;
 	datasetTreinamento = load("Dataset_series/serie1_trein.txt");

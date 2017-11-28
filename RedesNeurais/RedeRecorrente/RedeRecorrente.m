@@ -15,7 +15,7 @@ dJdC: Gradiente da matriz C;
 Y: Saída da rede;
 Yold: Saída atrasada da rede, serve como entrada interna;
 %}
-classdef RedeRecorrente < handle
+classdef RedeRecorrente < matlab.mixin.Copyable
 	properties (SetAccess = private)
 		h;
 		L;
@@ -76,19 +76,19 @@ classdef RedeRecorrente < handle
 			while EQMtr(nep) > 1.0e-5 && nep < rede.nepMax
 				nep = nep+1;
 				%Calcula o alfa
-				%bissecao(rede.alfa,rede,Xtr,Ydtr,Ntr,netr,ns);
+				bissecao(rede.alfa,rede,Xtr,Ydtr,Ntr,netr,ns);
 				%Atualiza os pesos
 				rede.A = rede.A - rede.alfa.valor*rede.dJdA;
 				rede.B = rede.B - rede.alfa.valor*rede.dJdB;
 				rede.C = rede.C - rede.alfa.valor*rede.dJdC;
 				%Salva os gradientes passados
-				dJdAOld = rede.dJdA;
-				dJdBOld = rede.dJdB;
-				dJdCOld = rede.dJdC;
+				%dJdAOld = rede.dJdA;
+				%dJdBOld = rede.dJdB;
+				%dJdCOld = rede.dJdC;
 				%Recálcula o gradiente e o EQM
 				[rede.dJdA, rede.dJdB, rede.dJdC, rede.Yold, EQMtr(nep)] = calcGrad(rede,Xtr,Ydtr,Ntr,netr,ns);
 				%Recálcula o alfa pelo ângulo
-				angulo(rede.alfa,rede,dJdAOld,dJdBOld,dJdCOld);
+				%angulo(rede.alfa,rede,dJdAOld,dJdBOld,dJdCOld);
 				%Validação
 				[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
 				if EQMvl(nep) < EQMvlBest
@@ -97,14 +97,14 @@ classdef RedeRecorrente < handle
 					CBest = rede.C;
 					EQMvlBest = EQMvl(nep);
 				end
-				%fprintf("EQMtr: %f\n",EQMtr(nep));
+				fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
 			%Grava o melhor valor da validação
 			rede.A = ABest;
 			rede.B = BBest;
 			rede.C = CBest;
 			
-			%RedeRecorrente.plotEQM(EQMtr, EQMvl);
+			RedeRecorrente.plotEQM(EQMtr, EQMvl);
 		end
 		
 		%{

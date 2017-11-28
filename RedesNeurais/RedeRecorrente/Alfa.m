@@ -48,9 +48,7 @@ classdef Alfa < handle
 			alfaM=(a+b)/2;
 			calcHLinha(alfa,alfaM,rede,X,Yd,N,ne,ns);
 			while abs(alfa.hLinha) > 1.0e-4
-				disp(alfa.hLinha)
-				fprintf("a: %2.5f b: %2.5f alfaM: %2.5f\n",a,b,alfaM);
-				pause;
+				%fprintf("a: %2.5f b: %2.5f alfaM: %2.5f\n",a,b,alfaM);
 				if alfa.hLinha > 0
 					b=alfaM;
 				else
@@ -155,7 +153,7 @@ classdef Alfa < handle
 			ANew = rede.A - alfaTest*rede.dJdA;
 			BNew = rede.B - alfaTest*rede.dJdB;
 			CNew = rede.C - alfaTest*rede.dJdC;
-			redeNew = rede;
+			redeNew = copy(rede);
 			setPesos(redeNew,ANew,BNew,CNew);
 			[dJdALinha, dJdBLinha, dJdCLinha, ~, ~] = calcGrad(redeNew,X,Yd,N,ne,ns);
 			d = -[reshape(rede.dJdA',1,numel(rede.dJdA))';reshape(rede.dJdB',1,numel(rede.dJdB))';reshape(rede.dJdC',1,numel(rede.dJdC))'];

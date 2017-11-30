@@ -1,8 +1,11 @@
+%{
+Função responsável por chamar a rotina de testes da MLP ou realizar apenas
+um treinamento e teste para os dados parâmetros
+%}
 function teste()
-	
 	hMax=12;
 	nepMax=20000;
-	alfaInicial=1;
+	alfaInicial=0.1;
 	lagMax = 15;
 	nroTestes = 10;
 	porcValidacao = 0.3;
@@ -10,8 +13,6 @@ function teste()
 	
 	%
 	h=5;
-	nepMax=20000;
-	alfaInicial=0.1;
 	lag=6;
 	datasetTreinamento = load("Dataset_series/serie1_trein.txt");
 	datasetTeste = load("Dataset_series/serie1_test.txt");
@@ -31,8 +32,28 @@ function teste()
 	%}
 end
 
+%{
+Função responsável por testar a MLP com diferentes valores de h (número de
+neurónios) e lag (número de entradas atrasadas) para cada uma das séries
+temporías. Para cada conjunto de valores são realizados <nroTestes> testes, sendo
+salvo em um arquivo a média dos EQM's e o desvio padrão desses testes.
+Parâmetros
+hMax: Número máximo de neurónios com o qual a rede será testada;
+nepMax: Número máximo de épocas para o treinamento da rede que será
+testada;
+alfaInicial: valor do alfa inicial com o qual a rede será inicializada;
+lagMax: Número máximo de entradas atrasadas para o qual a rede será
+testada;
+nroTestes: Número de testes que serão realizados para cada conjunto de
+atributos da rede;
+porcValidacao: Porcentagens de dados de treinamento que serão utilizados
+para validação;
+Saídas salvas em arquivos
+EQMmedioSerie.mat: Média dos EQM's testes realizados para uma dada série
+EQMdesvioSerie.mat: Desvio padrão dos EQM's dos testes realizados
+%}
 function testaMlp(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
-	for serie=3:4
+	for serie=1:4
 		EQMmedio = zeros(hMax-1,lagMax+1);
 		EQMdesvio = zeros(hMax-1,lagMax+1);
 		EQMtemp = zeros(1,10);
@@ -41,7 +62,7 @@ function testaMlp(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
 		for h=2:hMax
 			for lag=0:lagMax
 				fprintf("serie: %d h: %d lag: %d\n", serie, h,lag);
-				for i=1:nroTestes
+				parfor i=1:nroTestes
 					[Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao);
 					mlp = Mlp(h,nepMax,alfaInicial);
 					mlp.treinamento(Xtr,Ydtr,Xvl,Ydvl);
@@ -53,7 +74,7 @@ function testaMlp(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
 				EQMdesvio(h-1,lag+1) = std(EQMtemp);
 			end
 		end
-		save("EQMmedioAlfaGoldenSerie" + serie + ".mat","EQMmedio");
-		save("EQMdesvioAlfaGoldenSerie" + serie + ".mat","EQMdesvio");
+		save("EQMmedioAlfaBissecaoSerie" + serie + ".mat","EQMmedio");
+		save("EQMdesvioAlfaBissecaoSerie" + serie + ".mat","EQMdesvio");
 	end
 end

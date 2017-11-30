@@ -34,6 +34,8 @@ classdef Alfa < handle
 		function bissecao(alfa,mlp,X,Yd,N)
 			a = 0;
 			b = rand;
+			kMax = 50;
+			k=0;
 			%Checa se b torna hLinha positivo. Caso não, drobra o valor de b e
 			%repete a checagem.
 			hLinha = Alfa.calcHLinha(b,mlp,X,Yd,N);
@@ -43,7 +45,8 @@ classdef Alfa < handle
 			end
 			alfaM=(a+b)/2;
 			hLinha = Alfa.calcHLinha(alfaM,mlp,X,Yd,N);
-			while abs(hLinha) > 1.0e-4
+			while abs(hLinha) > 1.0e-4 && k <= kMax
+				k = k+1;
 				%fprintf("a: %2.5f b: %2.5f alfaM: %2.5f\n",a,b,alfaM);
 				if hLinha > 0
 					b=alfaM;
@@ -54,6 +57,9 @@ classdef Alfa < handle
 				hLinha = Alfa.calcHLinha(alfaM,mlp,X,Yd,N);
 			end
 			alfa.valor=alfaM;
+			if alfa.valor <= 1.0e-5
+				alfa.valor = 1.0e-5;
+			end
 			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
 
@@ -71,6 +77,8 @@ classdef Alfa < handle
 			r=(-1+sqrt(5))/2;
 			a = 0;
 			b = rand;
+			kMax = 50;
+			k=0;
 			%Checa se b torna hLinha positivo. Caso não, drobra o valor de b e
 			%repete a checagem.
 			hLinha = Alfa.calcHLinha(b,mlp,X,Yd,N);
@@ -80,7 +88,8 @@ classdef Alfa < handle
 			end
 			alfa1 = b - r*(b-a);
 			alfa2 = a + r*(b-a);
-			while (alfa2-alfa1)/2 > 1.0e-4
+			while (alfa2-alfa1)/2 > 1.0e-4 && k <= kMax
+				k = k+1;
 				%fprintf("alfa1: %2.5f alfa2: %2.5f alfaM: %2.5f\n",alfa1,alfa2,(alfa1+alfa2)/2);
 				hLinhaX1 = Alfa.calcHLinha(alfa1,mlp,X,Yd,N);
 				hLinhaX2 = Alfa.calcHLinha(alfa2,mlp,X,Yd,N);
@@ -101,6 +110,10 @@ classdef Alfa < handle
 				end
 			end
 			alfa.valor = (alfa1 + alfa2)/2;
+			if alfa.valor <= 1.0e-5
+				alfa.valor = 1.0e-5;
+			end
+			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
 
 		%{
@@ -114,12 +127,17 @@ classdef Alfa < handle
 		sendo cálculado;
 		%}
 		function angulo(alfa,dJdAOld,dJdBOld,mlp)
-			EOld = [reshape(dJdAOld',1,numel(dJdAOld)) reshape(dJdBOld',1,numel(dJdBOld))];
+			EOld = -alfa.valor*[reshape(dJdAOld',1,numel(dJdAOld)) reshape(dJdBOld',1,numel(dJdBOld))];
 			ENew = [reshape(mlp.dJdA',1,numel(mlp.dJdA)) reshape(mlp.dJdB',1,numel(mlp.dJdB))];
-			cosTeta = ENew*EOld'/(norm(ENew)*norm(EOld));
+			cosTeta = -ENew*EOld'/(norm(ENew)*norm(EOld));
 			alfa.valor = alfa.valor*(exp(1)^(0.1*cosTeta));
-			if alfa.valor >= 1
-				alfa.valor = mlp.alfa.valor*0.9;
+			alfa.valor = alfa.valor/(1+alfa.valor*(sum(ENew.*ENew)));
+			%Impoem limites para os valores min e max do alfa
+			if alfa.valor < 1.0e-5
+				alfa.valor=1.0e-5;
+			end
+			if alfa.valor > 10
+				alfa.valor = 10;
 			end
 			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
@@ -139,8 +157,6 @@ classdef Alfa < handle
 			ANew = mlp.A - alfaTest*mlp.dJdA;
 			BNew = mlp.B - alfaTest*mlp.dJdB;
 			[dJdALinha,dJdBLinha] = calcGrad(X,Yd,ANew,BNew,N);
-			%d = [mlp.dJdA(:); mlp.dJdB(:)];
-			%g = [dJdALinha(:); dJdBLinha(:)];
 			d = -[reshape(mlp.dJdA',1,numel(mlp.dJdA))'; reshape(mlp.dJdB',1,numel(mlp.dJdB))'];
 			g = [reshape(dJdALinha',1,numel(dJdALinha))'; reshape(dJdBLinha',1,numel(dJdBLinha))'];
 			hLinha = g'*d;

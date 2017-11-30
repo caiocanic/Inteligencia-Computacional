@@ -1,3 +1,7 @@
+%{
+Função responsável por chamar a rotina de testes da RNN ou realizar apenas
+um treinamento e teste para os dados parâmetros
+%}
 function teste()
 	hMax=6;
 	nepMax=10000;
@@ -26,6 +30,26 @@ function teste()
 	%}
 end
 
+%{
+Função responsável por testar a RNN com diferentes valores de h (número de
+neurónios) e lag (número de entradas atrasadas) para cada uma das séries
+temporías. Para cada conjunto de valores são realizados <nroTestes> testes, sendo
+salvo em um arquivo a média dos EQM's e o desvio padrão desses testes.
+Parâmetros
+hMax: Número máximo de neurónios com o qual a rede será testada;
+nepMax: Número máximo de épocas para o treinamento da rede que será
+testada;
+alfaInicial: valor do alfa inicial com o qual a rede será inicializada;
+lagMax: Número máximo de entradas atrasadas para o qual a rede será
+testada;
+nroTestes: Número de testes que serão realizados para cada conjunto de
+atributos da rede;
+porcValidacao: Porcentagens de dados de treinamento que serão utilizados
+para validação;
+Saídas salvas em arquivos
+EQMmedioSerie.mat: Média dos EQM's testes realizados para uma dada série
+EQMdesvioSerie.mat: Desvio padrão dos EQM's dos testes realizados
+%}
 function testaRede(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
 	for serie=1:4
 		EQMmedio = zeros(hMax-1,lagMax+1);
@@ -46,7 +70,7 @@ function testaRede(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
 				EQMdesvio(h-1,lag+1) = std(EQMtemp);
 			end
 		end
-		save("EQMmedioAlfaAnguloSerie" + serie + ".mat","EQMmedio");
-		save("EQMdesvioAlfaAnguloSerie" + serie + ".mat","EQMdesvio");
+		save("EQMmedioAlfaBissecaoSerie" + serie + ".mat","EQMmedio");
+		save("EQMdesvioAlfaBissecaoSerie" + serie + ".mat","EQMdesvio");
 	end
 end

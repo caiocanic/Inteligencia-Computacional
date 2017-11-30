@@ -97,14 +97,14 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 					CBest = rede.C;
 					EQMvlBest = EQMvl(nep);
 				end
-				fprintf("EQMtr: %f\n",EQMtr(nep));
+				%fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
 			%Grava o melhor valor da validação
 			rede.A = ABest;
 			rede.B = BBest;
 			rede.C = CBest;
 			
-			RedeRecorrente.plotEQM(EQMtr, EQMvl);
+			%RedeRecorrente.plotEQM(EQMtr, EQMvl);
 		end
 		
 		%{

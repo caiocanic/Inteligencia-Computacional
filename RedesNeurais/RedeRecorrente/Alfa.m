@@ -38,6 +38,8 @@ classdef Alfa < handle
 		function bissecao(alfa,rede,X,Yd,N,ne,ns)
 			a = 0;
 			b = rand;
+			kMax = 50;
+			k=0;
 			%Checa se b torna hLinha positivo. Caso não, drobra o valor de b e
 			%repete a checagem.
 			calcHLinha(alfa,b,rede,X,Yd,N,ne,ns);
@@ -47,7 +49,8 @@ classdef Alfa < handle
 			end
 			alfaM=(a+b)/2;
 			calcHLinha(alfa,alfaM,rede,X,Yd,N,ne,ns);
-			while abs(alfa.hLinha) > 1.0e-4
+			while abs(alfa.hLinha) > 1.0e-4 && k <= kMax
+				k = k+1;
 				%fprintf("a: %2.5f b: %2.5f alfaM: %2.5f\n",a,b,alfaM);
 				if alfa.hLinha > 0
 					b=alfaM;
@@ -58,7 +61,10 @@ classdef Alfa < handle
 				calcHLinha(alfa,alfaM,rede,X,Yd,N,ne,ns);
 			end
 			alfa.valor=alfaM;
-			fprintf("alfa: %2.5f\n",alfa.valor);
+			if alfa.valor <= 1.0e-5
+				alfa.valor = 1.0e-5;
+			end
+			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
 
 		%{
@@ -77,6 +83,8 @@ classdef Alfa < handle
 			r=(-1+sqrt(5))/2;
 			a = 0;
 			b = rand;
+			kMax = 50;
+			k=0;
 			%Checa se b torna hLinha positivo. Caso não, drobra o valor de b e
 			%repete a checagem.
 			calcHLinha(alfa,b,rede,X,Yd,N,ne,ns);
@@ -86,9 +94,9 @@ classdef Alfa < handle
 			end
 			alfa1 = b - r*(b-a);
 			alfa2 = a + r*(b-a);
-			while (alfa2-alfa1)/2 > 1.0e-4
-				fprintf("alfa1: %2.5f alfa2: %2.5f alfaM: %2.5f\n",alfa1,alfa2,(alfa1+alfa2)/2);
-				pause;
+			while (alfa2-alfa1)/2 > 1.0e-4 && k <= kMax
+				k = k+1;
+				%fprintf("alfa1: %2.5f alfa2: %2.5f alfaM: %2.5f\n",alfa1,alfa2,(alfa1+alfa2)/2);
 				calcHLinha(alfa,alfa1,rede,X,Yd,N,ne,ns);
 				hLinhaX1 = alfa.hLinha;
 				calcHLinha(alfa,alfa2,rede,X,Yd,N,ne,ns);
@@ -110,6 +118,10 @@ classdef Alfa < handle
 				end
 			end
 			alfa.valor = (alfa1 + alfa2)/2;
+			if alfa.valor <= 1.0e-5
+				alfa.valor = 1.0e-5;
+			end
+			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end
 
 		%{
@@ -133,7 +145,7 @@ classdef Alfa < handle
 				alfa.valor=1.0e-5;
 			end
 			if alfa.valor > 10
-				alfa.valor = 1;
+				alfa.valor = 10;
 			end
 			%fprintf("alfa: %2.5f\n",alfa.valor);
 		end

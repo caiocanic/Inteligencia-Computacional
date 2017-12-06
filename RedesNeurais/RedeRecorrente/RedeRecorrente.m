@@ -20,6 +20,7 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 		h;
 		L;
 		nepMax;
+		nepConvergencia;
 		alfa;
 		A;
 		dJdA
@@ -95,6 +96,7 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 					ABest = rede.A;
 					BBest = rede.B;
 					CBest = rede.C;
+					rede.nepConvergencia = nep;
 					EQMvlBest = EQMvl(nep);
 				end
 				%fprintf("EQMtr: %f\n",EQMtr(nep));

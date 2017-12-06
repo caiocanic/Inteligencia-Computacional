@@ -96,6 +96,7 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 					ABest = rede.A;
 					BBest = rede.B;
 					CBest = rede.C;
+					YoldBest = rede.Yold;
 					rede.nepConvergencia = nep;
 					EQMvlBest = EQMvl(nep);
 				end
@@ -105,7 +106,7 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 			rede.A = ABest;
 			rede.B = BBest;
 			rede.C = CBest;
-			
+			rede.Yold = YoldBest;
 			%RedeRecorrente.plotEQM(EQMtr, EQMvl);
 		end
 		

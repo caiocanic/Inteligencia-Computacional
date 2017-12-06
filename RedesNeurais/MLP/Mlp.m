@@ -3,6 +3,7 @@ Classe responsável pelo objeto que representa uma Multilayer Perceptron.
 Atributos
 h: Número de neurónios da rede;
 nepMax: Número máximo de épocas para a condição de parada;
+nepConvergencia: Época em que a rede convergiu;
 alfa: Objeto da classe Alfa, representa a taxa de aprendizagem;
 A: Matriz de pesos das entradas;
 B: Matriz de pesos da camada de saída;
@@ -14,6 +15,7 @@ classdef Mlp < handle
 	properties (SetAccess = private)
 		h;
 		nepMax;
+		nepConvergencia;
 		alfa;
 		A;
 		B;
@@ -87,6 +89,7 @@ classdef Mlp < handle
 				if EQMvl(nep) < EQMvlBest
 					ABest = mlp.A;
 					BBest = mlp.B;
+					mlp.nepConvergencia = nep;
 					EQMvlBest = EQMvl(nep);
 				end
 				mlp.A = Anew;

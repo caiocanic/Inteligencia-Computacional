@@ -46,8 +46,8 @@ EQMdesvioSerie.mat: Desvio padrão dos EQM's dos testes realizados
 %}
 function testaParametros(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao)
 	for serie=1:4
-		EQMmedio = zeros(hMax-1,lagMax+1);
-		EQMdesvio = zeros(hMax-1,lagMax+1);
+		EQMmedio = zeros(hMax-1,lagMax);
+		EQMdesvio = zeros(hMax-1,lagMax);
 		EQMtemp = zeros(1,nroTestes);
 		datasetTreinamento = load("Dataset_series/serie" + serie + "_trein.txt");
 		datasetTeste = load("Dataset_series/serie"+ serie + "_test.txt");

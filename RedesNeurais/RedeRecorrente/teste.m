@@ -5,15 +5,15 @@ um treinamento e teste para os dados parâmetros
 function teste()
 	hMax=6;
 	nepMax=5000;
-	alfaInicial = 0.1;
+	alfaInicial = 1;
 	lagMax = 7;
 	nroTestes = 10;
 	porcValidacao = 0.3;
-	%testaParametros(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao);
+	testaParametros(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao);
 	
-	%
-	h=6;
-	lag=7;
+	%{
+	h=2;
+	lag=2;
 	testaRede(3,h,lag,nepMax,alfaInicial,nroTestes,porcValidacao);
 	%}
 	%{
@@ -96,7 +96,7 @@ function testaRede(serie, h,lag,nepMax,alfaInicial,nroTestes,porcValidacao)
 	[Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaDados(datasetTreinamento, datasetTeste,porcValidacao);
 	EQMtemp = zeros(1,nroTestes);
 	nepConvergenciaTemp = zeros(1,nroTestes);
-	for i=1:nroTestes
+	parfor i=1:nroTestes
 		fprintf("serie: %d h: %d lag: %d teste: %d\n",serie, h,lag,i);
 		rede = RedeRecorrente(h,lag,nepMax,alfaInicial);
 		treinamento(rede,Xtr,Ydtr,Xvl,Ydvl)

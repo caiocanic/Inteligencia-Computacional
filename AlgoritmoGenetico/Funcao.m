@@ -1,7 +1,7 @@
 %{
 Objeto responsável por representar a função matemática que será otimizada
 por meio do Algorítmo Genético.
-Propriedades
+Atributos
 calcula: Function handle que aponta para o método que gera a saída da
 função matemática selecionada ao criar o objeto.
 intervaloBusca: Intervalo de busca no qual a função será otimizada.
@@ -16,7 +16,7 @@ classdef Funcao
 	methods
 		%{
 		Método construtor
-		Atributos
+		Parâmetros
 		nome: Nome da função matemática que esse objeto irá representar. É
 		utilizado para chamar o método apropriado para cálculo da saída.
 		intervaloBusca: Intervalo no qual a função será otimizada.

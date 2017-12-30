@@ -32,12 +32,12 @@ classdef Selecao
 		%Seleção bi-classista.
 		function selecionados = classista(genetico,nroSorteios,b,w)
 			minR=1;
-			maxR=genetico.tamanho.populacao;
-			qtdMelhores=ceil(b*genetico.populacao.tamanho);
-			qtdPiores=floor(w*genetico.populacao.tamanho);
+			maxR=genetico.populacao.tamanho;
+			qtdMelhores=ceil(b*nroSorteios);
+			qtdPiores=floor(w*nroSorteios);
 			qtdDemais = nroSorteios-qtdMelhores-qtdPiores;
 			melhores = (1:qtdMelhores)';
-			piores = (genetico.populacao.tamanho:-1:genetico.populacao.tamanho-qtdPiores)';
+			piores = (genetico.populacao.tamanho:-1:genetico.populacao.tamanho-qtdPiores+1)';
 			demais = zeros(qtdDemais,1);
 			for i=1:qtdDemais
 				r = minR + (maxR-minR).*rand;

@@ -28,6 +28,40 @@ classdef Mutacao
 				end
 			end
 		end
+		
+		%Mutação por soma de um valor pequeno
+		function novaPopulacao = soma(genetico,populacaoInicial)
+			a =0;
+			b = 0.1;
+			novaPopulacao = populacaoInicial;
+			for i=1:size(novaPopulacao,1)
+				for j=1:genetico.populacao.nroBits
+					r = rand;
+					%Checa se havera mutação
+					if r <= genetico.pMutacao
+						n = a + (b-a).*rand;
+						novaPopulacao(i,j) = novaPopulacao(i,j)+n;
+					end
+				end
+			end
+		end
+		
+		%Mutação por multiplicação
+		function novaPopulacao = multiplicacao(genetico,populacaoInicial)
+			a =0.9;
+			b = 1.1;
+			novaPopulacao = populacaoInicial;
+			for i=1:size(novaPopulacao,1)
+				for j=1:genetico.populacao.nroBits
+					r = rand;
+					%Checa se havera mutação
+					if r <= genetico.pMutacao
+						n = a + (b-a).*rand;
+						novaPopulacao(i,j) = novaPopulacao(i,j)*n;
+					end
+				end
+			end
+		end
 	end
 	
 end

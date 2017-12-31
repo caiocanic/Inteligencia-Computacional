@@ -205,6 +205,10 @@ classdef Genetico < handle
 				b = 0.20;
 				w = 0.10;
 				selecionados = Selecao.classista(genetico,nroSorteios,b,w);
+			elseif genetico.tipoSelecao == "torneio"
+				selecionados = Selecao.torneio(genetico,nroSorteios);
+			else
+				error('Seleção inválida');
 			end
 		end
 	end
@@ -287,7 +291,27 @@ classdef Genetico < handle
 						end
 						novaPopulacao = Mutacao.multiplicacao(genetico,novaPopulacao);
 					case "aleatoria"
-						novaPopulacao = round(rand(tamanhoSubPopulacao,genetico.populacao.nroBits));
+						selecionados = seleciona(genetico,tamanhoSubPopulacao);
+						if novaPopulacao == ""
+							%Gera subpopulação para mutar
+							novaPopulacao = geraSubpopulacao(genetico,selecionados);
+						end
+						novaPopulacao = Mutacao.aleatoria(genetico,novaPopulacao);
+						
+					case "nova"
+						if genetico.representacao == "binaria"
+							novaPopulacao = round(rand(tamanhoSubPopulacao,genetico.populacao.nroBits));
+						elseif genetico.representacao == "real"
+							novaPopulacao = zeros(tamanhoSubPopulacao,genetico.populacao.nroBits);
+							for k=1:tamanhoSubPopulacao
+								for l=1:genetico.populacao.nroBits
+									a = genetico.funcao.intervaloBusca(l,1);
+									b = genetico.funcao.intervaloBusca(l,2);
+									novaPopulacao(k,l) = a + (b-a).*rand;
+								end
+							end
+						end
+							
 					case "melhor"
 						novaPopulacao = zeros(tamanhoSubPopulacao,genetico.populacao.nroBits);
 						for k=1:tamanhoSubPopulacao

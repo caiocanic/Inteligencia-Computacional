@@ -45,5 +45,29 @@ classdef Selecao
 			end
 			selecionados = [melhores;piores;demais];
 		end
+		
+		%Seleção por torneio
+		function selecionados = torneio(genetico,nroSorteios)
+			selecionados = zeros(nroSorteios);
+			%Define o número de "combates"
+			q=10;
+			a = 1;
+			b = genetico.populacao.tamanho;
+			vitorias = zeros(genetico.populacao.tamanho,2);
+			vitorias(:,2) = 1:genetico.populacao.tamanho;
+			for i=1:genetico.populacao.tamanho
+				for j=1:q
+					r = round(a + (b-a).*rand);
+					if genetico.fitness.matriz(i) > genetico.fitness.matriz(r)
+						vitorias(i,1) = vitorias(i,1)+1;
+					end
+				end
+			end
+			%Ordena a matriz de vitórias
+			vitorias = sortrows(vitorias,1);
+			for i=1:nroSorteios
+				selecionados(i) = vitorias(i,2);
+			end
+		end
 	end
 end

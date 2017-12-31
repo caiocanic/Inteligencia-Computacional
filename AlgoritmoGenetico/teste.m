@@ -2,16 +2,16 @@ function teste()
 	tipo = 'modificado';
 	nroTestes=5;
 	representacao = 'real';
-	nomeSelecao = 'classista';
+	nomeSelecao = 'torneio';
 	nomeFuncao = ["gold";"sumS";"deJong";"ackley";"bump";"rastrigin"];
 	intervaloBusca = {[-2,2;-2,2];[-10,10;-10,10];[-2,2;-2,2];...
 		[-32.768,32.768;-32.768,32.768];[0,10;0,10];[-5.12,5.12;-5.12,5.12]};
 	precisao=1.0e-6;
 	%operacoes = "";
-	%operacoes = ["uniforme pontual";"aleatoria";"troca";"umPonto"];
-	operacoes = ["media soma";"melhor";"combinacao";"multiplicacao"];
+	%operacoes = ["uniforme pontual";"nova";"troca";"umPonto"];
+	operacoes = ["media soma";"melhor";"nova";"combinacao";"multiplicacao";"aleatoria"];
 	pCrossover=0.8;
-	pMutacao=0.20;
+	pMutacao=0.10;
 	geracoesMax = 500;
 	tamanhoPopulacao=250;
 

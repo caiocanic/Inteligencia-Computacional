@@ -62,6 +62,23 @@ classdef Mutacao
 				end
 			end
 		end
+		
+		%Mutação aleatória
+		function novaPopulacao = aleatoria(genetico,populacaoInicial)
+			novaPopulacao = populacaoInicial;
+			for i=1:size(novaPopulacao,1)
+				for j=1:genetico.populacao.nroBits
+					r = rand;
+					%Checa se havera mutação
+					if r <= genetico.pMutacao
+						a =genetico.funcao.intervaloBusca(j,1);
+						b =genetico.funcao.intervaloBusca(j,1);
+						n = a + (b-a).*rand;
+						novaPopulacao(i,j) = n;
+					end
+				end
+			end
+		end
 	end
 	
 end

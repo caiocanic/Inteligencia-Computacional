@@ -1,0 +1,30 @@
+[System]
+Name='FISserie1lag0'
+Type='sugeno'
+Version=2.0
+NumInputs=1
+NumOutputs=1
+NumRules=2
+AndMethod='prod'
+OrMethod='probor'
+ImpMethod='prod'
+AggMethod='sum'
+DefuzzMethod='wtaver'
+
+[Input1]
+Name='entrada1'
+Range=[0 1]
+NumMFs=2
+MF1='in1mf1':'gbellmf',[0.129269901704466 2.15574264780431 0.169105383896725]
+MF2='in1mf2':'gbellmf',[0.250832315807532 2.07399191217237 0.979266119177972]
+
+[Output1]
+Name='saida'
+Range=[-0.952163025645 0.469303168984]
+NumMFs=2
+MF1='out1mf1':'linear',[0.816345021622337 -0.817020520543193]
+MF2='out1mf2':'linear',[-4.30452284930344 3.33117547942531]
+
+[Rules]
+1, 1 (1) : 1
+2, 2 (1) : 1

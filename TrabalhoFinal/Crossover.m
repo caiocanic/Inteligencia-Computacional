@@ -30,7 +30,7 @@ classdef Crossover
 		function novaPopulacao = doisPontos(genetico,selecionados)
 			%Garante pelo intervalo que o ponto não esteja nas pontas
 			intervalo = [2,size(genetico.populacao.matriz,2)-1];
-			novaPopulacao = zeros(length(selecionados)/2,intervalo(2));
+			novaPopulacao = zeros(genetico.populacao.tamanho,genetico.populacao.nroBits);
 			for i=1:2:length(selecionados)/2
 				%Checa se ocorrerá crossover
 				r = rand;
@@ -51,13 +51,13 @@ classdef Crossover
 						p2 = temp;
 					end
 					%Gera filho um
-					novaPopulacao(i,1:p1) = genetico.populacao.matriz(selecionados(i),1:p1-1);
+					novaPopulacao(i,1:p1-1) = genetico.populacao.matriz(selecionados(i),1:p1-1);
 					novaPopulacao(i,p1:p2) = genetico.populacao.matriz(selecionados(i+1),p1:p2);
-					novaPopulacao(i,p2:end) = genetico.populacao.matriz(selecionados(i),p2+1:end);
+					novaPopulacao(i,p2+1:end) = genetico.populacao.matriz(selecionados(i),p2+1:end);
 					%Gera filho dois
-					novaPopulacao(i+1,1:p1) = genetico.populacao.matriz(selecionados(i+1),1:p1);
+					novaPopulacao(i+1,1:p1-1) = genetico.populacao.matriz(selecionados(i+1),1:p1-1);
 					novaPopulacao(i+1,p1:p2) = genetico.populacao.matriz(selecionados(i),p1:p2);
-					novaPopulacao(i+1,p2:end) = genetico.populacao.matriz(selecionados(i+1),p2:end);
+					novaPopulacao(i+1,p2+1:end) = genetico.populacao.matriz(selecionados(i+1),p2+1:end);
 				else
 					%Filhos são iguais aos pais
 					novaPopulacao(i,:)= genetico.populacao.matriz(selecionados(i),:);

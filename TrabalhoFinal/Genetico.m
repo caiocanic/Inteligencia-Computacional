@@ -112,8 +112,8 @@ classdef Genetico < handle
 				end
 			elseif genetico.tipo == "modificado"
 				%Define o tamanho max e min das subpopulações
-				tamanhoMinSub = floor(genetico.populacao.tamanho*0.4);
-				tamanhoMaxSub = ceil(genetico.populacao.tamanho*0.5);
+				tamanhoMinSub = floor(genetico.populacao.tamanho*0.3);
+				tamanhoMaxSub = ceil(genetico.populacao.tamanho*0.4);
 				while geracoes < geracoesMax
 					%Realiza as operações definidas
 					populacaoIntermediaria = double.empty;
@@ -284,6 +284,9 @@ classdef Genetico < handle
 					case "uniforme"
 						selecionados = seleciona(genetico,tamanhoSubPopulacao*2);
 						novaPopulacao = Crossover.uniforme(genetico,selecionados);
+					case "doisPontos"
+						selecionados = seleciona(genetico,tamanhoSubPopulacao*2);
+						novaPopulacao = Crossover.doisPontos(genetico,selecionados);
 					case "pontual"
 						selecionados = seleciona(genetico,tamanhoSubPopulacao);
 						if novaPopulacao == ""

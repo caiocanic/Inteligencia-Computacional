@@ -113,7 +113,7 @@ classdef Genetico < handle
 			elseif genetico.tipo == "modificado"
 				%Define o tamanho max e min das subpopulações
 				tamanhoMinSub = floor(genetico.populacao.tamanho*0.3);
-				tamanhoMaxSub = ceil(genetico.populacao.tamanho*0.4);
+				tamanhoMaxSub = ceil(genetico.populacao.tamanho*0.5);
 				while geracoes < geracoesMax
 					%Realiza as operações definidas
 					populacaoIntermediaria = double.empty;
@@ -308,11 +308,19 @@ classdef Genetico < handle
 							novaPopulacao = geraSubpopulacao(genetico,selecionados);
 						end
 						novaPopulacao = Mutacao.reversiva(genetico,novaPopulacao);	
-					case "nova"
+					case "novos"
 						novaPopulacao = round(rand(tamanhoSubPopulacao,genetico.populacao.nroBits));
 					case "melhores"
 						ordena(genetico);
 						novaPopulacao = genetico.populacao.matriz(end-tamanhoSubPopulacao+1:end,:);
+					case "aleatorios"
+						novaPopulacao = zeros(tamanhoSubPopulacao,genetico.populacao.nroBits);
+						a = 1;
+						b = genetico.populacao.tamanho;
+						for k=1:tamanhoSubPopulacao
+							r = round(a + (b-a)*rand);
+							novaPopulacao(k,:) = genetico.populacao.matriz(r,:);
+						end
 					otherwise
 						error('Operação inválida');
 				end

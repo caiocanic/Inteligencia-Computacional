@@ -65,6 +65,7 @@ classdef Crossover
 				end
 			end
 		end
+		
 		%Crossover uniforme
 		function novaPopulacao = uniforme(genetico,selecionados)
 			novaPopulacao = zeros(length(selecionados)/2,genetico.populacao.nroBits);

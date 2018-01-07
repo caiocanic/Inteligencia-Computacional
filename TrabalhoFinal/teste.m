@@ -3,16 +3,16 @@ function teste()
 tipo='modificado';
 precisao=1.0e-6;
 nomeSelecao='classista';
-operacoes = ["uniforme troca";"umPonto reversiva";"doisPontos pontual";"nova";"melhores"];
+operacoes = ["uniforme troca";"umPonto reversiva";"doisPontos pontual";"novos";"melhores";"aleatorios"];
 pMutacao=0.1;
 pCrossover=0.8;
 
 %Rede
-lag=11;
+lag=10;
 datasetTreinamento = load("database/series/serie1_trein.txt");
 datasetTeste= load("database/series/serie1_test.txt");
-[Xtr,Ydtr,Xts,Ydts] = processaDados(datasetTreinamento,datasetTeste,lag);
-parametrosRede.h=4;
+[Xtr,Ydtr,Xts,Ydts] = processaSeries(datasetTreinamento,datasetTeste,lag);
+parametrosRede.h=9;
 parametrosRede.ne = size(Xtr,2);
 parametrosRede.ns = size(Ydtr,2);
 

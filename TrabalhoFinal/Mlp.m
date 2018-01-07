@@ -44,10 +44,10 @@ classdef Mlp < handle
 		%}
 		function calcSaida(mlp,X,Yd)
 			[N,~] = size(X);
-			X = [X, ones(N,1)];
+			X = [ones(N,1),X];
 			Zin = X*mlp.A';
 			Z = tanh(Zin);
-			Yin = [Z,ones(N,1)]*mlp.B';
+			Yin = [ones(N,1),Z]*mlp.B';
 			mlp.Y = tanh(Yin);
 			erro = mlp.Y - Yd;
 			mlp.EQM = 1/N*sum(sum(erro.*erro));

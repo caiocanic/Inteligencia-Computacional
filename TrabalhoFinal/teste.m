@@ -6,19 +6,18 @@ nomeSelecao='classista';
 operacoes = ["uniforme troca";"umPonto reversiva";"doisPontos pontual";"novos";"melhores";"aleatorios"];
 pMutacao=0.1;
 pCrossover=0.8;
-
 %Rede
-lag=10;
-datasetTreinamento = load("database/series/serie1_trein.txt");
-datasetTeste= load("database/series/serie1_test.txt");
-[Xtr,Ydtr,Xts,Ydts] = processaSeries(datasetTreinamento,datasetTeste,lag);
-parametrosRede.h=9;
-parametrosRede.ne = size(Xtr,2);
-parametrosRede.ns = size(Ydtr,2);
+parametrosRede.intervaloH=[2,10];
+parametrosRede.intervaloLag=[0,15];
+%Dados
+datasetTreinamento = load("series/serie1_trein.txt");
+datasetTeste= load("series/serie1_test.txt");
 
+%Executa
 genetico = Genetico(tipo,precisao,nomeSelecao,operacoes,pMutacao,pCrossover,parametrosRede);
-genetico.executa(1000,250,Xtr,Ydtr);
+genetico.executa(1000,250,datasetTreinamento);
 figure(genetico.fitness.grafico)
-genetico.fenotipo.melhor.calcSaida(Xts,Ydts);
-genetico.fenotipo.melhor.EQM
+
+%genetico.fenotipo.melhor.calcSaida(Xts,Ydts);
+%genetico.fenotipo.melhor.EQM
 end

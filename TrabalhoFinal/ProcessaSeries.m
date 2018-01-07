@@ -3,6 +3,9 @@ Classe responsável pela chamada das funções de pré-processamento dos conjunt
 de treinamento e teste das séries temporais.
 %}
 classdef ProcessaSeries
+	properties (Constant)
+		porcValidacao=0.3;
+	end
 	methods (Static = true)
 		%{
 		Função encarregada pelo pré-processamento do conjunto de dados de
@@ -16,7 +19,7 @@ classdef ProcessaSeries
 		Ydtr: Saída desejada para o conjunto Xtr;
 		datasetNormTr: Conjunto de dados da etapa de treinamento normalizados;
 		%}
-		function [Xtr,Ydtr,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag)
+		function [Xtr,Ydtr,Xvl,Ydvl,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag)
 			%Remove tendência da serie (se houver) e normaliza
 			datasetNormTr = detrend(datasetTreinamento);
 			%Adiciona os lags e a saída desejada
@@ -29,9 +32,18 @@ classdef ProcessaSeries
 				i = i+1;
 			end
 			X(:,end) = datasetTreinamento(2:end);
-			%Gera os conjuntos de treinamento
-			Xtr=X(:,1:end-1);
-			Ydtr=X(:,end);
+			%Randomiza a ordem das entradas
+			[m,~] = size(X);
+			idx = randperm(m);
+			temp=X;
+			for i=1:m
+				X(idx(i),:)=temp(i,:);
+			end
+			%Gera os conjuntos de treinamento e validação
+			Xvl=X(1:floor(length(X)*(ProcessaSeries.porcValidacao)),1:end-1);
+			Ydvl=X(1:floor(length(X)*(ProcessaSeries.porcValidacao)),end);
+			Xtr=X(ceil(length(X)*(ProcessaSeries.porcValidacao)):end,1:end-1);
+			Ydtr=X(ceil(length(X)*(ProcessaSeries.porcValidacao)):end,end);
 		end
 		
 		%{

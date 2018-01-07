@@ -87,13 +87,13 @@ classdef Genetico < handle
 		Xtr: Conjunto de treinamento para as redes MLP.
 		Ydtr: Saída desejada para Xtr.
 		%}
-		function executa(genetico,geracoesMax,tamanhoPopulacao,datasetTreinamento)
+		function executa(genetico,geracoesMax,tamanhoPopulacao,Xtr,Ydtr,Xvl,Ydvl)
 			geracoes = 1;
 			melhorFitness = zeros(geracoesMax,1);
 			mediaFitness = zeros(geracoesMax,1);
 			inicializaPopulacao(genetico,tamanhoPopulacao);
 			geraFenotipo(genetico);
-			calcFitness(genetico,datasetTreinamento);
+			calcFitness(genetico,Xtr,Ydtr,Xvl,Ydvl);
 			melhorFitness(geracoes) = genetico.fitness.melhor;
 			mediaFitness(geracoes) = genetico.fitness.medio;
 			fprintf("geração: %d fitnessMelhor: %2.4f fitnessMedio: %2.4f\n",geracoes,genetico.fitness.melhor,genetico.fitness.medio);
@@ -105,7 +105,7 @@ classdef Genetico < handle
 					geracoes = geracoes+1;
 					genetico.populacao.matriz = novaPopulacao;
 					geraFenotipo(genetico);
-					calcFitness(genetico,datasetTreinamento);
+					calcFitness(genetico,Xtr,Ydtr,Xvl,Ydvl);
 					melhorFitness(geracoes) = genetico.fitness.melhor;
 					mediaFitness(geracoes) = genetico.fitness.medio;
 					fprintf("geração: %d fitnessMelhor: %2.4f fitnessMedio: %2.4f\n",geracoes,genetico.fitness.melhor,genetico.fitness.medio);
@@ -132,7 +132,7 @@ classdef Genetico < handle
 					genetico.populacao.matriz = populacaoIntermediaria;
 					genetico.populacao.tamanho = size(populacaoIntermediaria,1);
 					geraFenotipo(genetico);
-					calcFitness(genetico,datasetTreinamento);
+					calcFitness(genetico,Xtr,Ydtr,Xvl,Ydvl);
 					%Seleciona população intermediária
 					selecionados = seleciona(genetico,tamanhoOld);
 					novaPopulacao = zeros(length(selecionados),genetico.populacao.nroBits);
@@ -143,7 +143,7 @@ classdef Genetico < handle
 					genetico.populacao.tamanho = tamanhoOld;
 					genetico.populacao.matriz = novaPopulacao;
 					geraFenotipo(genetico);
-					calcFitness(genetico,datasetTreinamento);
+					calcFitness(genetico,Xtr,Ydtr,Xvl,Ydvl);
 					geracoes = geracoes +1;
 					melhorFitness(geracoes) = genetico.fitness.melhor;
 					mediaFitness(geracoes) = genetico.fitness.medio;
@@ -166,24 +166,22 @@ classdef Genetico < handle
 		%}
 		function inicializaPopulacao(genetico,tamanhoPopulacao)
 			genetico.populacao.tamanho = tamanhoPopulacao;
+			%Define o número de bits para características
+			nroBits = genetico.parametrosRede.ne;
 			syms n;
+			genetico.populacao.tamanhoVariavel(1) = nroBits;
 			%Cálcula o número de bits para h
 			eqn=(genetico.parametrosRede.intervaloH(2)-genetico.parametrosRede.intervaloH(1))/((2^n)-1)== 2*1;
-			sol = ceil(double(vpasolve(eqn,n)));
-			nroBits = sol;
-			genetico.populacao.tamanhoVariavel(1) = sol;
-			%Cálcula o número de bits para lag
-			eqn=(genetico.parametrosRede.intervaloLag(2)-genetico.parametrosRede.intervaloLag(1))/((2^n)-1)== 2*1;
 			sol = ceil(double(vpasolve(eqn,n)));
 			nroBits = nroBits+sol;
 			genetico.populacao.tamanhoVariavel(2) = sol;
 			%Cálcula o número de bits para A
 			eqn=(2)/((2^n)-1)== 2*genetico.precisao;
 			sol = ceil(double(vpasolve(eqn,n)));
-			nroBits = nroBits+(genetico.parametrosRede.intervaloH(2)*(genetico.parametrosRede.intervaloLag(2)+1+1)*sol);
+			nroBits = nroBits+(genetico.parametrosRede.intervaloH(2)*(genetico.parametrosRede.ne+1)*sol);
 			genetico.populacao.tamanhoVariavel(3) = sol;
 			%Calcula o número de bits para B
-			nroBits = nroBits+(1*(genetico.parametrosRede.intervaloH(2)+1)*sol);
+			nroBits = nroBits+(genetico.parametrosRede.ns*(genetico.parametrosRede.intervaloH(2)+1)*sol);
 			%Inicializa a população
 			genetico.populacao.matriz = round(rand(tamanhoPopulacao,nroBits));
 			genetico.populacao.nroBits = nroBits;
@@ -197,55 +195,79 @@ classdef Genetico < handle
 		function geraFenotipo(genetico)
 			genetico.fenotipo.matriz = Mlp.empty;
 			for k=1:genetico.populacao.tamanho
-				%Traduz h
+				%Traduz características
 				inicioVar=1;
 				fimVar=genetico.populacao.tamanhoVariavel(1);
+				%Adiciona 1 no começo para que o bias nunca zere
+				genetico.fenotipo.caracteristicas(k,:) = [1,genetico.populacao.matriz(k,inicioVar:fimVar)];
+				%Traduz h
+				inicioVar=fimVar+1;
+				fimVar=fimVar+genetico.populacao.tamanhoVariavel(2);
 				h = genetico.parametrosRede.intervaloH(1)+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*1;
-				%Traduz lag
-				inicioVar = fimVar+1;
-				fimVar = fimVar+genetico.populacao.tamanhoVariavel(2);
-				lag = genetico.parametrosRede.intervaloLag(1)+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*1;
 				%Traduz matriz A
 				inicioVar = fimVar+1;
 				fimVar = fimVar+genetico.populacao.tamanhoVariavel(3);
-				ne = lag+1;
-				A = zeros(genetico.parametrosRede.intervaloH(2),genetico.parametrosRede.intervaloLag(2)+1+1);
+				m=1;
+				n=1;
+				A = double.empty;
 				for i=1:genetico.parametrosRede.intervaloH(2)
-					for j=1:genetico.parametrosRede.intervaloLag(2)+1+1
-						if i>h || j>ne+1
-							A(i,j)=0;
-						else
-							A(i,j)= -1+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*genetico.precisao;
+					for j=1:genetico.parametrosRede.ne+1
+						if i<=h && genetico.fenotipo.caracteristicas(k,j)==1
+							A(m,n)=-1+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*(2/bi2de(ones(1,genetico.populacao.tamanhoVariavel(3)))); 
+							n=n+1;
 						end
 						inicioVar = fimVar+1;
 						fimVar = fimVar+genetico.populacao.tamanhoVariavel(3);
 					end
+					n=1;
+					m=m+1;
 				end
 				%Traduz matriz B
-				ns = 1;
-				B = zeros(ns,genetico.parametrosRede.intervaloH(2)+1);
-				for i=1:ns
+				B=double.empty;
+				m=1;
+				n=1;
+				for i=1:genetico.parametrosRede.ns
 					for j=1:genetico.parametrosRede.intervaloH(2)+1
-						if j>h+1
-							B(i,j)=0;
-						else
-							B(i,j) = -1+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*genetico.precisao;
+						if j<=h+1
+							B(m,n)=-1+bi2de(genetico.populacao.matriz(k,inicioVar:fimVar))*(2/bi2de(ones(1,genetico.populacao.tamanhoVariavel(3))));
+							n = n+1;
 						end
 						inicioVar = fimVar+1;
 						fimVar = fimVar+genetico.populacao.tamanhoVariavel(3);
 					end
+					n=1;
+					m=m+1;
 				end
 				genetico.fenotipo.matriz(k) = Mlp(h,A,B);
 			end
 		end
 		
 		%Cálcula o fitness e acha o melhor indivíduo
-		function calcFitness(genetico,datasetTreinamento)
+		function calcFitness(genetico,Xtr,Ydtr,Xvl,Ydvl)
 			genetico.fitness.matriz = zeros(genetico.populacao.tamanho,1);
-			[Xtr,Ydtr,~] = ProcessaSeries.processaDatasetTreinamento(datasetTreinamento,genetico.parametrosRede.intervaloLag(2));
-			for k=1:genetico.populacao.tamanho
-				genetico.fenotipo.matriz(k).calcSaida(Xtr,Ydtr);
-				genetico.fitness.matriz(k,1) = 1/genetico.fenotipo.matriz(k).EQM;
+			%Treina as redes se desejado
+			if genetico.parametrosRede.treinamento == true
+				for k=1:genetico.populacao.tamanho
+					genetico.fenotipo.matriz(k).treinamento(10,Xtr,Ydtr)
+					genetico.fenotipo.matriz(k).calcSaida(Xvl,Ydvl);
+					genetico.fitness.matriz(k,1) = 1/genetico.fenotipo.matriz(k).EQM;
+				end
+			%Somente calcula o fitness
+			else
+				temp = [Xtr;Xvl];
+				Yd = [Ydtr;Ydvl];
+				for k=1:genetico.populacao.tamanho
+					X = zeros(size(temp,1),sum(genetico.fenotipo.caracteristicas(k,:))-1);
+					m=1;
+					for i=2:(size(genetico.fenotipo.caracteristicas,2)-1)
+						if genetico.fenotipo.caracteristicas(k,i)==1
+							X(:,m) = temp(:,i-1);
+							m=m+1;
+						end
+					end
+					genetico.fenotipo.matriz(k).calcSaida(X,Yd);
+					genetico.fitness.matriz(k,1) = 1/genetico.fenotipo.matriz(k).EQM;
+				end
 			end
 			[genetico.fitness.melhor,pos] = max(genetico.fitness.matriz);
 			genetico.fitness.medio = mean(genetico.fitness.matriz);

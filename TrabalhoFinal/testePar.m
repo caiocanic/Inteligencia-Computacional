@@ -3,7 +3,7 @@ function testePar()
 	tipo='modificado';
 	precisao=1.0e-6;
 	nomeSelecao='classista';
-	operacoes = ["uniforme troca";"umPonto reversiva";"doisPontos pontual";"novos";"melhores";"aleatorios"];
+	operacoes = ["uniforme troca";"umPonto reversiva";"doisPontos"; "pontual";"novos";"melhores";"aleatorios"];
 	pMutacao=0.2;
 	pCrossover=0.8;
 	%Rede

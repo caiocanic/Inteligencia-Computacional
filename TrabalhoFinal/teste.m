@@ -20,8 +20,8 @@ function teste()
 	
 	%Executa
 	genetico = Genetico(tipo,precisao,nomeSelecao,operacoes,pMutacao,pCrossover,parametrosRede);
-	genetico.executa(2000,350,Xtr,Ydtr,Xvl,Ydvl);
-	figure(genetico.fitness.grafico)
+	genetico.executa(2000,300,Xtr,Ydtr,Xvl,Ydvl);
+	save("GA - Classificação","genetico");
 
 	%genetico.fenotipo.melhor.calcSaida(Xts,Ydts);
 	%genetico.fenotipo.melhor.EQM

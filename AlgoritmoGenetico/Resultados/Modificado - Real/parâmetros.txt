@@ -1,0 +1,15 @@
+Representação real
+precisão 1.0e-4
+Seleção por torneio
+pCrossover 0.8
+pMutacao 0.1
+gerações 500
+tamanho população 250
+Opeardores
+	Crossover media + Mutação por soma
+	subpopulação com melhores indivíduos
+	Subpopulcação de indivíduos novos
+	Crossover por combinação linear
+	Mutação por multiplicação
+	Mutação substitutiva por um número aleatório
+Há subpopulações

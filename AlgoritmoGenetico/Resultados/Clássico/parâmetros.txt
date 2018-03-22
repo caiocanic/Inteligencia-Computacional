@@ -1,0 +1,10 @@
+Representação binária
+precisão 1.0e-6
+Seleção via roleta
+pCrossover 0.8
+pMutacao 0.1
+geracoes 500
+tamanho populacao 250
+Crossover de um ponto
+Mutação pontual
+Filhos sempre substituem os pais, não há sub-populações

@@ -1,0 +1,13 @@
+Representação binária
+precisão 1.0e-6
+Seleção classista
+gerações 500
+população 250
+pCrossover 0.8
+pMutacao 0.1
+Operadores
+	Crossover Uniforme + Mutação Pontual
+	Crossover um ponto
+	Mutação por troca
+	Aleatória
+Há sub-populações

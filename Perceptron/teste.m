@@ -23,13 +23,13 @@ Xvl = [];
 Ydvl = [];
 %}
 
+porcValidacao = 0.3;
 treinamento = load("treinamento.txt");
 teste = load("teste.txt");
-[Xtr,Ydtr,Xts,Ydts] = processaDados(treinamento,teste);
+[Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaDados(treinamento,teste,porcValidacao);
 Nts = size(Xts,1);
 Xts = [Xts, ones(Nts,1)];
-Xvl = [];
-Ydvl=[];
+
 
 [A,vErroTr,~] = perceptron(Xtr, Ydtr, Xvl, Ydvl);
 plot(vErroTr);

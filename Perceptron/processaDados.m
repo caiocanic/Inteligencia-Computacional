@@ -1,26 +1,38 @@
-function [Xtr,Ydtr,Xts,Ydts] = processaDados(treinamento,teste)
-	[Xtr,Ydtr,media,desvio] = processaTreinamento(treinamento);
+function [Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaDados(treinamento,teste,porcValidacao)
+	[Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao);
 	[Xts,Ydts] = processaTeste(teste,media,desvio);
 end
 
-function [Xtr,Ydtr,media,desvio] = processaTreinamento(treinamento)
+function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao)
 	Ntr = size(treinamento,1);
 	%Separa a saída desejada
 	classesTr = treinamento(:,end);
 	nroClasses = max(classesTr);
-	Ydtr = zeros(Ntr,nroClasses);
+	Y = zeros(Ntr,nroClasses);
 	%Rotula as classes
 	for i=1:Ntr
-		Ydtr(i,classesTr(i)) = 1;
+		Y(i,classesTr(i)) = 1;
 	end
-	%Normaliza o treinamento
-	Xtr = treinamento(:,1:end-1);
-	ne = size(Xtr,2);
-	media = mean(Xtr);
-	desvio = std(Xtr);
+	%Normaliza os dados
+	X = treinamento(:,1:end-1);
+	ne = size(X,2);
+	media = mean(X);
+	desvio = std(X);
 	for i=1:ne
-		Xtr(:,i) = (Xtr(:,i)-media(i))/desvio(i);
+		X(:,i) = (X(:,i)-media(i))/desvio(i);
 	end
+	%Randomiza a ordem dos dados
+	dados = [X,Y];
+	idx = randperm(Ntr);
+	temp=dados;
+	for i=1:Ntr
+		dados(idx(i),:)=temp(i,:);
+	end
+	%Separa em treinamento e validação
+	Xvl=dados(1:floor(length(dados)*(porcValidacao)),1:end-nroClasses);
+	Ydvl=dados(1:floor(length(dados)*(porcValidacao)),end-nroClasses+1:end);
+	Xtr=dados(ceil(length(dados)*(porcValidacao)):end,1:end-nroClasses);
+	Ydtr=dados(ceil(length(dados)*(porcValidacao)):end,end-nroClasses+1:end);
 end
 
 function [Xts,Ydts] = processaTeste(teste,media,desvio)

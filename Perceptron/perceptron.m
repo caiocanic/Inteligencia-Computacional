@@ -1,6 +1,6 @@
 function [A,vErroTr,vErroVl] = perceptron(Xtr, Ydtr, Xvl, Ydvl)
 	%Parâmetros internos
-	nVlMax = 20;
+	nVlMax = 15;
 	alfa=1;
 	%Se não existe validação, define o número máximo de épocas
 	if isempty(Xvl)
@@ -14,7 +14,9 @@ function [A,vErroTr,vErroVl] = perceptron(Xtr, Ydtr, Xvl, Ydvl)
 	Xtr = [Xtr,ones(Ntr,1)];
 	ne = size(Xtr,2);
 	%Inicializar os pesos
-	A = rands(ns,ne)/5;
+	a = -0.2;
+	b = 0.2;
+	A = a + (b-a).*rand(ns,ne);
 	%Calcula a saída para conjunto de treinamento
 	[~,erroTr] = calcSaida(Xtr,Ydtr,A);
 	EQMtr = 1/Ntr*sum(sum(erroTr.*erroTr));

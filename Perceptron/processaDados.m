@@ -21,18 +21,25 @@ function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porc
 	for i=1:ne
 		X(:,i) = (X(:,i)-media(i))/desvio(i);
 	end
-	%Randomiza a ordem dos dados
-	dados = [X,Y];
-	idx = randperm(Ntr);
-	temp=dados;
-	for i=1:Ntr
-		dados(idx(i),:)=temp(i,:);
+	%Se pedido, separa em treinamento e validação
+	if porcValidacao > 0
+		%Randomiza a ordem dos dados
+		dados = [X,Y];
+		idx = randperm(Ntr);
+		temp=dados;
+		for i=1:Ntr
+			dados(idx(i),:)=temp(i,:);
+		end
+		Xvl=dados(1:floor(length(dados)*(porcValidacao)),1:end-nroClasses);
+		Ydvl=dados(1:floor(length(dados)*(porcValidacao)),end-nroClasses+1:end);
+		Xtr=dados(ceil(length(dados)*(porcValidacao)):end,1:end-nroClasses);
+		Ydtr=dados(ceil(length(dados)*(porcValidacao)):end,end-nroClasses+1:end);
+	else
+		Xvl = [];
+		Ydvl = [];
+		Xtr = X;
+		Ydtr = Y;
 	end
-	%Separa em treinamento e validação
-	Xvl=dados(1:floor(length(dados)*(porcValidacao)),1:end-nroClasses);
-	Ydvl=dados(1:floor(length(dados)*(porcValidacao)),end-nroClasses+1:end);
-	Xtr=dados(ceil(length(dados)*(porcValidacao)):end,1:end-nroClasses);
-	Ydtr=dados(ceil(length(dados)*(porcValidacao)):end,end-nroClasses+1:end);
 end
 
 function [Xts,Ydts] = processaTeste(teste,media,desvio)

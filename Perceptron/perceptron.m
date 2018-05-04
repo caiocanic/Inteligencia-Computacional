@@ -20,7 +20,7 @@ function [A,vErroTr,vErroVl] = perceptron(Xtr, Ydtr, Xvl, Ydvl,alfa,nEpocasMax)
 	b = 0.2;
 	A = a + (b-a).*rand(ns,ne);
 	%}
-	%Inicialização fixa dos pesos para teste
+	%Inicialização fixa dos pesos para testes
 	A = zeros(ns,ne)+0.1;
 	
 	%Cálculos do perceptron

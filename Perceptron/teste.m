@@ -44,9 +44,6 @@ function acerto = traduzClasse(Y,Ydts)
 	correto = 0;
 	[~,I] = max(Y,[],2);
 	[~,Id] = max(Ydts,[],2);
-	disp([Y,Ydts]);
-	disp([I,Id]);
-	pause;
 	for i=1:N
 		if (I(i) == Id(i))
 			correto = correto+1;

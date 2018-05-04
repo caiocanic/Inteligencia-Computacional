@@ -4,6 +4,7 @@ function teste()
 	testaPerceptron(alfa,nEpocasMax)
 end
 
+%Rotina de teste para a função perceptron
 function testaPerceptron(alfa,nEpocasMax)
 	treinamento = load("dados/iris_treinamento.txt");
 	teste = load("dados/iris_teste.txt");
@@ -11,7 +12,7 @@ function testaPerceptron(alfa,nEpocasMax)
 	Nts = size(Xts,1);
 	Xts = [Xts, ones(Nts,1)];
 	EQMtrFinal = zeros(length(alfa),length(nEpocasMax));
-	acuracia = zeros(length(alfa),length(nEpocasMax));
+	acerto = zeros(length(alfa),length(nEpocasMax));
 	
 	for i=1:length(nEpocasMax)
 		grafico = figure('Name',['Número Épocas - ',int2str(nEpocasMax(i))],'NumberTitle','Off','Visible', 'off');
@@ -22,12 +23,12 @@ function testaPerceptron(alfa,nEpocasMax)
 			EQMtrFinal(j,i) = vErroTr(end);
 			%Testa
 			[Y,~] = calcSaida(Xts,Ydts,A);
-			acuracia(j,i) = traduzClasse(Y,Ydts);
+			acerto(j,i) = traduzClasse(Y,Ydts);
 			plot(vErroTr,'DisplayName',num2str(alfa(j),'%.2f\n'));
 			hold on;
 		end
 		save('EQMtrfFinal.mat','EQMtrFinal');
-		save('acuracia.mat','acuracia');
+		save('acerto.mat','acerto');
 		hold off;
 		title("Perceptron - "+int2str(nEpocasMax(i))+" Épocas");
 		xlabel("Épocas");
@@ -37,15 +38,19 @@ function testaPerceptron(alfa,nEpocasMax)
 	end
 end
 
-function acuracia = traduzClasse(Y,Ydts)
+%Traduz a saída do perceptron de binária para real
+function acerto = traduzClasse(Y,Ydts)
 	N = length(Y);
 	correto = 0;
 	[~,I] = max(Y,[],2);
 	[~,Id] = max(Ydts,[],2);
+	disp([Y,Ydts]);
+	disp([I,Id]);
+	pause;
 	for i=1:N
 		if (I(i) == Id(i))
 			correto = correto+1;
 		end
 	end
-	acuracia = correto/N;
+	acerto = correto/N;
 end

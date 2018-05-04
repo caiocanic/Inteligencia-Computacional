@@ -1,8 +1,11 @@
+%Função para normalizar os dados e gerar conjunto de validação
 function [Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaDados(treinamento,teste,porcValidacao)
 	[Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao);
 	[Xts,Ydts] = processaTeste(teste,media,desvio);
 end
 
+%Normaliza o treinamento usando zscores e separa o conjunto de validação se
+%solicitado
 function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao)
 	Ntr = size(treinamento,1);
 	%Separa a saída desejada
@@ -42,6 +45,8 @@ function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porc
 	end
 end
 
+%Normaliza o conjunto de teste usando zscores. Utiliza a média e o desvio
+%do conjunto de treinamento.
 function [Xts,Ydts] = processaTeste(teste,media,desvio)
 	Nts = size(teste,1);
 	%Separa a saída desejada

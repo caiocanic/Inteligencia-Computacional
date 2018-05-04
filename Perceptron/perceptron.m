@@ -1,3 +1,5 @@
+%Implementação do perceptron do função de ativação sigmoid
+%Possível utilizar validação e passo ótimo
 function [A,vErroTr,vErroVl] = perceptron(Xtr, Ydtr, Xvl, Ydvl,alfa,nEpocasMax)
 	%Parâmetros internos
 	nVlMax = 15;
@@ -45,6 +47,7 @@ function [A,vErroTr,vErroVl] = perceptron(Xtr, Ydtr, Xvl, Ydvl,alfa,nEpocasMax)
 		[~,erroTr] = calcSaida(Xtr,Ydtr,A);
 		EQMtr = 1/Ntr*sum(sum(erroTr.*erroTr));
 		vErroTr = [vErroTr;EQMtr];
+		%Checa se havera validação
 		if ~isempty(Xvl)
 			[~,erroVl] = calcSaida(Xvl,Ydvl,A);
 			EQMvl = 1/Nvl*sum(sum(erroVl.*erroVl)); 

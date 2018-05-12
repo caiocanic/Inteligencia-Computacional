@@ -2,8 +2,8 @@
 function teste()
 	alfaInicial = [0.1,0.25,0.5,1];
 	nEpocasMax = [50,100,250,500,1000,10000,50000,100000];
-	funcao = 'sigmoid';
-	nroTestes=10;
+	funcao = 'softmax';
+	nroTestes=25;
 	%testaPerceptronParametros(alfaInicial,nEpocasMax,funcao)
 	testaPerceptronAutomatico(funcao,nroTestes)
 end
@@ -42,6 +42,7 @@ function testaPerceptronParametros(alfaInicial,nEpocasMax,funcao)
 	end
 end
 
+%Rotina de testes para o Perceptron com parametrização automática
 function testaPerceptronAutomatico(funcao,nroTestes)
 	treinamento = load("dados/iris_treinamento.txt");
 	teste = load("dados/iris_teste.txt");
@@ -70,7 +71,8 @@ function testaPerceptronAutomatico(funcao,nroTestes)
 		saveas(grafico,['teste',int2str(i),'.png']);
 		save('resultados.mat','resultados')
 	end
-
+	resultados = sortrows(resultados); %#ok<NASGU>
+	save('resultados.mat','resultados');
 end
 
 %Traduz a saída do perceptron de binária para real

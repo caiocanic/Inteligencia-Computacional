@@ -20,6 +20,8 @@ function [dJdA, dJdB] = calcGrad(X,Yd,A,funcA,B,funcB,N,h)
 		Z = 1./(1+exp(-Zin));
 	elseif funcA == "tangente"
 		Z = tanh(Zin);
+	elseif funcA == "linear"
+		Z = Zin;
 	end
 	%Determina qual a função da saída
 	Yin = [Z,ones(N,1)]*B';
@@ -67,6 +69,8 @@ function [dJdA, dJdB] = calcGrad(X,Yd,A,funcA,B,funcB,N,h)
 		dJdA = 1/N*(dJdZ.*((1-Z).*Z))'*X;
 	elseif funcA == "tangente"
 		dJdA = 1/N*(dJdZ.*(1-(Z.*Z)))'*X;
+	elseif funcA == "linear"
+		dJdA = 1/N*(dJdZ'*X);
 	end
 
 end

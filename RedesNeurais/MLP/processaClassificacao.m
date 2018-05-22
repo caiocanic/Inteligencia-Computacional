@@ -1,18 +1,24 @@
 %Função para normalizar os dados e gerar conjunto de validação
-function [Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaClassificacao(treinamento,teste,porcValidacao)
-	[Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao);
-	[Xts,Ydts] = processaTeste(teste,media,desvio);
+function [Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaClassificacao(treinamento,teste,porcValidacao,func)
+	[Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao,func);
+	[Xts,Ydts] = processaTeste(teste,media,desvio,func);
 end
 
 %Normaliza o treinamento usando zscores e separa o conjunto de validação se
 %solicitado
-function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao)
+function [Xtr,Ydtr,Xvl,Ydvl,media,desvio] = processaTreinamento(treinamento,porcValidacao,func)
 	Ntr = size(treinamento,1);
 	%Separa a saída desejada
 	classesTr = treinamento(:,end);
 	nroClasses = max(classesTr);
-	Y = zeros(Ntr,nroClasses);
 	%Rotula as classes
+	if func(2) == "tangente" 
+		Y = zeros(Ntr,nroClasses)-1;
+	elseif func(1) == "tangente" && func(2) == "linear" 
+		Y = zeros(Ntr,nroClasses)-1;
+	else
+		Y = zeros(Ntr,nroClasses);
+	end
 	for i=1:Ntr
 		Y(i,classesTr(i)) = 1;
 	end
@@ -47,13 +53,19 @@ end
 
 %Normaliza o conjunto de teste usando zscores. Utiliza a média e o desvio
 %do conjunto de treinamento.
-function [Xts,Ydts] = processaTeste(teste,media,desvio)
+function [Xts,Ydts] = processaTeste(teste,media,desvio,func)
 	Nts = size(teste,1);
 	%Separa a saída desejada
 	classesTs = teste(:,end);
 	nroClasses = max(classesTs);
-	Ydts = zeros(Nts,nroClasses);
 	%Rotula as classes
+	if func(2) == "tangente"
+		Ydts = zeros(Nts,nroClasses)-1;
+	elseif func(1) == "tangente" && func(2) == "linear" 
+		Ydts = zeros(Nts,nroClasses)-1;
+	else
+		Ydts = zeros(Nts,nroClasses);
+	end
 	for i=1:Nts
 		Ydts(i,classesTs(i)) = 1;
 	end

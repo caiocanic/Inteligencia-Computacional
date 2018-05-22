@@ -110,7 +110,7 @@ classdef Mlp < handle
 				mlp.Y = mlp.calcSaida(mlp.A,mlp.funcA,mlp.B,mlp.funcB,Xtr,Ntr);
 				errotr = mlp.Y-Ydtr;
 				EQMtr(nep) = 1/Ntr*sum(sum(errotr.*errotr));
-				fprintf("EQMtr: %f\n",EQMtr(nep));
+				%fprintf("EQMtr: %f\n",EQMtr(nep));
 			end
 			mlp.A = ABest;
 			mlp.B = BBest;
@@ -156,6 +156,8 @@ classdef Mlp < handle
 				Z = 1./(1+exp(-Zin));
 			elseif funcA == "tangente"
 				Z = tanh(Zin);
+			elseif funcA == "linear"
+				Z = Zin;
 			end	
 			%Determina qual a função da saída
 			Yin = [Z,ones(N,1)]*B';

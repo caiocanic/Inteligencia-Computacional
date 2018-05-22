@@ -2,26 +2,24 @@
 Função responsável por chamar a rotina de testes da MLP ou realizar apenas
 um treinamento e teste para os dados parâmetros
 %}
-function teste()
+function testeClassificacao()
 	hMax=12;
-	nepMax=5000;
+	nepMax=25000;
 	alfaInicial=0.1;
 	lagMax = 15;
 	nroTestes = 10;
 	porcValidacao = 0.3;
-	testaParametros(hMax, nepMax, alfaInicial, lagMax, nroTestes, porcValidacao);
-	
-	%
-	h=12;
+	h=3;
 	lag=15;
-	%testaMlp(3,h,lag,nepMax,alfaInicial,nroTestes,porcValidacao)
-	%}
-	%{
-	plot(datasetTeste(2:end,1),'DisplayName','dataset');
-	hold on;
-	plot(mlp.Y(1:end-1,1),'DisplayName','Y');
-	hold off;
-	%}
+	
+	treinamento = load("Classificação/iris_treinamento.txt");
+	teste = load("Classificação/iris_teste.txt");
+	[Xtr,Ydtr,Xvl,Ydvl,Xts,Ydts] = processaClassificacao(treinamento,teste,porcValidacao);
+	mlp = Mlp("sigmoid","softmax",h,nepMax,alfaInicial);
+	mlp.treinamento(Xtr,Ydtr,Xvl,Ydvl);
+	mlp.teste(Xts);
+	acerto = traduzClasse(mlp.Y,Ydts)
+	
 end
 
 %{
@@ -116,4 +114,18 @@ function testaMlp(serie,h,lag,nepMax,alfaInicial,nroTestes,porcValidacao)
 	nepConvergenciaDesvio = std(nepConvergenciaTemp);
 	save("nepConvergenciaMedia" + serie + ".mat","nepConvergenciaMedia");
 	save("nepConvergenciaDesvio" + serie + ".mat","nepConvergenciaDesvio");
+end
+
+%Traduz a saída da classificação de binária para real
+function acerto = traduzClasse(Y,Ydts)
+	N = length(Y);
+	correto = 0;
+	[~,I] = max(Y,[],2);
+	[~,Id] = max(Ydts,[],2);
+	for i=1:N
+		if (I(i) == Id(i))
+			correto = correto+1;
+		end
+	end
+	acerto = correto/N;
 end

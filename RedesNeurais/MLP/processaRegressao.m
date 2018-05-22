@@ -14,7 +14,7 @@ Xvl: Conjunto de dados para a etapa de validação;
 Ydvl: Saída desejada para o conjunto Xvl;
 Xts: Conjunto de dados de entrada para a etapa de teste;
 %}
-function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaDados(datasetTreinamento, datasetTeste, lag, porcValidacao)
+function [Xtr,Ydtr,Xvl,Ydvl,Xts] = processaRegressao(datasetTreinamento, datasetTeste, lag, porcValidacao)
 	[Xtr,Ydtr,Xvl,Ydvl,datasetNormTr] = processaDatasetTreinamento(datasetTreinamento, lag, porcValidacao);
 	Xts = processaDatasetTeste(datasetNormTr, datasetTeste, lag);
 end

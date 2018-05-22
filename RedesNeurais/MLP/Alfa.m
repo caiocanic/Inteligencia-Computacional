@@ -156,7 +156,7 @@ classdef Alfa < handle
 		function hLinha = calcHLinha(alfaTest,mlp,X,Yd,N)
 			ANew = mlp.A - alfaTest*mlp.dJdA;
 			BNew = mlp.B - alfaTest*mlp.dJdB;
-			[dJdALinha,dJdBLinha] = calcGrad(X,Yd,ANew,BNew,N);
+			[dJdALinha,dJdBLinha] = calcGrad(X,Yd,ANew,mlp.funcA,BNew,mlp.funcB,N,mlp.h);
 			d = -[reshape(mlp.dJdA',1,numel(mlp.dJdA))'; reshape(mlp.dJdB',1,numel(mlp.dJdB))'];
 			g = [reshape(dJdALinha',1,numel(dJdALinha))'; reshape(dJdBLinha',1,numel(dJdBLinha))'];
 			hLinha = g'*d;

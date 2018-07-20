@@ -31,7 +31,7 @@ transformada em uma transação.
 path: Caminho para o dataset que será pré-processado.
 %%Saídas%%
 transacoes: struct representando as transações que serão analisadas pelo
-algoritmo Apriori.
+	algoritmo Apriori.
 nroItens: Número total de itens diferentes existentes nas transações. 
 %}
 function [nroItens,transacoes] = preProcessamentoVotes(path)

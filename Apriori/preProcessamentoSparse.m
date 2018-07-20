@@ -17,6 +17,7 @@ nroItens: Número total de itens diferentes existentes nas transações.
 function [nroItens,transacoes] = preProcessamentoSparse(dataset)
 	%Abre o arquivo que vai ser lido.
 	fid = fopen(dataset,'r');
+	fprintf("Lendo arquivo de entrada\n");
 	%Primeira linha do arquivo é o número de itens
 	linha = fgetl(fid);
 	nroItens = str2double(linha);

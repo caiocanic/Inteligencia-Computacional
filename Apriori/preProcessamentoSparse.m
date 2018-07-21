@@ -1,7 +1,8 @@
 %{
 Antes de usar a função de pré-processamento foram removidos manualmente
 dos arquivos a lista de itens e os indicadores de começo e fim dos dados.
-Além disso foi icluído na primeira linha o número de transações.
+Além disso foi icluído na primeira linha o número de ítens e na segunda o
+número de transações.
 %}
 %{
 Função que realiza o pré-processamento dos conjuntos de dados Sparce. Ela

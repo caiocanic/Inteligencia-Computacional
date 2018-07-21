@@ -91,11 +91,17 @@ classdef Apriori < handle
 					k=k-1;
 				end
 			end
-			apriori.itemsetsFrequentes = itemsetsFrequentes;
-			%Encontrados os k-itemsets frequentes, gera as regras de
-			%associação
-			regras = apriori.geraRegras(itemsetsFrequentes,k);
-			apriori.regras = regras;
+			%Se tiver encontrado pelo menos 2-itemsets frequentes, gera as
+			%regras.
+			if k>=2
+				apriori.itemsetsFrequentes = itemsetsFrequentes;
+				%Encontrados os k-itemsets frequentes, gera as regras de
+				%associação
+				regras = apriori.geraRegras(itemsetsFrequentes,k);
+				apriori.regras = regras;
+			else
+				fprintf("Impossível gerar regras");
+			end
 		end
 	end
 	

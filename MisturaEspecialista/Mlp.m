@@ -88,7 +88,7 @@ classdef Mlp < handle
 			%Adiciona o bias
 			Xtr = [Xtr, ones(Ntr,1)];
 			Xvl = [Xvl, ones(Nvl,1)];
-			%Inicializa as matrizes de pesos A e B
+			%Inicializa as matrizes de pesos A e B, se não existirem
 			if isempty(mlp.A) && isempty(mlp.B)
 				a = -0.2;
 				b = 0.2;
@@ -109,6 +109,8 @@ classdef Mlp < handle
 				errovl = Yvl-Ydvl;
 				EQMvl(nep) = 1/Nvl*sum(sum(errovl.*errovl));
 				EQMvlBest = EQMvl(nep);
+				ABest = mlp.A;
+				BBest = mlp.B;
 			end
 			%Treina e valida até que atinga a condição de parada.
 			%Condição 1: Erro mínimo

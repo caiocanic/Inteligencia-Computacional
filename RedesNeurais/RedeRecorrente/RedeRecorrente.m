@@ -74,6 +74,10 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 			%Inicia a validação
 			[~,EQMvl(nep)] = calcSaida(rede,Xvl,Ydvl);
 			EQMvlBest = EQMvl(nep);
+			ABest = rede.A;
+			BBest = rede.B;
+			CBest = rede.C;
+			YoldBest = rede.Yold;
 			while EQMtr(nep) > 1.0e-5 && nep < rede.nepMax
 				nep = nep+1;
 				%Calcula o alfa
@@ -124,6 +128,21 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 			[rede.Yts, EQMts] = calcSaida(rede,Xts,Ydts);
 		end
 		
+		%Dado um valor X, prediz o pr�ximo da s�rie
+		function Y = prediz(rede,X)
+			[N,ns] = size(X);
+			Y = zeros(N,1);
+			X = [X, ones(N,1)];
+			for t=1:N
+				U = X(t,:)';
+				S = rede.A*rede.Yold + rede.B*U;
+				Z = tanh(S);
+				Y(t,:) = rede.C*[Z;1];
+				rede.Yold(2:end) = rede.Yold(1:end-1);
+				rede.Yold(1:rede.L:(ns-1)*rede.L+1) = Y(t);
+			end
+		end
+		
 		%{
 		Função auxiliar utilizada no cálculo do alfa. Atribui os valores
 		dos parâmetros as matrizes de pesos.
@@ -166,7 +185,7 @@ classdef RedeRecorrente < matlab.mixin.Copyable
 				rede.Yold(2:end) = rede.Yold(1:end-1);
 				rede.Yold(1:rede.L:(ns-1)*rede.L+1) = Y(t);
 			end
-			EQM = 1/N*sum(sum(vetErro.*vetErro))/N;
+			EQM = 1/N*sum(sum(vetErro.*vetErro));%/N
 		end
 	end
 	methods (Static = true)

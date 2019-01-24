@@ -81,5 +81,5 @@ function [dJdA, dJdB, dJdC, Yold, EQM] = calcGrad(rede,X,Yd,N,ne,ns)
 	dJdA = reshape(dJTdA,(ns*rede.L),rede.h)'/N;
 	dJdB = reshape(dJTdB,ne+1,rede.h)'/N;
 	dJdC = reshape(dJTdC,rede.h+1,ns)'/N;
-	EQM = 1/N*sum(sum(vetErro.*vetErro))/N;
+	EQM = 1/N*sum(sum(vetErro.*vetErro));%/N
 end
